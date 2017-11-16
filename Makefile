@@ -1,6 +1,7 @@
 NAME = Expert_System
 
-SRC = main.cpp
+SRC = main.cpp Lexer.class.cpp Operator.class.cpp Token.class.cpp \
+		TokenFact.class.cpp
 
 OBJ = $(addprefix $(O_DIR)/,$(SRC:.cpp=.o))
 
@@ -8,7 +9,7 @@ O_DIR = ./objs
 
 S_DIR = ./srcs
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -ferror-limit=2 -I includes
 
 CC = clang++
 
@@ -19,7 +20,7 @@ $(NAME): $(OBJ)
 
 $(O_DIR)/%.o: $(S_DIR)/%.cpp
 	@mkdir -p $(O_DIR)
-	@$(CC) -o $@ -c $<
+	@$(CC) $(CFLAGS) -o $@ -c $<
 
 all: $(NAME)
 
