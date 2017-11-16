@@ -9,3 +9,11 @@
 //   Updated: 2017/11/16 15:29:16 by semartin         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
+
+#include "Fact.class.hpp"
+
+Fact::Fact(std::string & name) : szName(name)
+{
+	iState = FACT_FALSE;
+	bIsSet = false;
+}
