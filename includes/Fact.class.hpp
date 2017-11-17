@@ -13,29 +13,18 @@
 #pragma once
 
 #include <iostream>
+#include "Link.class.hpp"
 
-#define FACT_TRUE 0
-#define FACT_FALSE 1
-#define FACT_UNKOWN 2
-
-class Fact
+class Fact : public Link
 {
 
 private:
 	std::string const szName;
-	int iState;
-	bool bIsSet;
-
 	Fact();
 
 public:
 	Fact(std::string & name);
 	~Fact() {} ;
 
-	void setState(int state) { iSate = state; } ;
-	void setbSet(bool isSet)  {bIsSet = isSet; } ;
-
-	int iGetState() { return iState; } ;
-	bool bGetIsSet() { return bIsSet; } ;
-
+	std::string getName() { return szName; };
 };

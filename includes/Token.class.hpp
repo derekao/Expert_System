@@ -10,8 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
-#ifndef TOKEN_CLASS_HPP
-# define TOKEN_CLASS_HPP
+#pragma once
 
 # include <iostream>
 
@@ -30,5 +29,3 @@ public:
 	/* Accessors */
 	bool bGetIsOperator(void) const;
 };
-
-#endif

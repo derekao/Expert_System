@@ -10,8 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
-#ifndef OPERATOR_CLASS_HPP
-# define OPERATOR_CLASS_HPP
+#pragma once
 
 # include <iostream>
 # include "Token.class.hpp"
@@ -45,5 +44,3 @@ public:
 
 	int iGetPrecedence(void); //TODO
 };
-
-#endif

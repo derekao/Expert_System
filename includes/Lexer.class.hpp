@@ -10,8 +10,7 @@
 //                                                                            //
 // ************************************************************************** //
 
-#ifndef LEXER_CLASS_HPP
-# define LEXER_CLASS_HPP
+#pragma once
 
 # include <iostream>
 # include <fstream>
@@ -27,7 +26,7 @@ class Lexer
 private:
 	bool bError;
 	std::ifstream *CFileStream;
-	std::vector< std::vector<Token> > CVectorToken;
+	std::vector< std::vector<Token *> *> *CVectorToken;
 
 	std::vector<std::string> VectorError;
 
@@ -35,12 +34,11 @@ private:
 	void CheckLineFormat(std::string & szLine, int iLine);
 	void LexLine(std::string szLine, int iLine);
 
+	void PrintMemory();
+
 public:
-	Lexer(std::string szFileName, std::vector< std::vector<Token> > & CVector);
+	Lexer(std::string szFileName, std::vector< std::vector<Token *> *> *CVector);
 	~Lexer(void);
-
-
 
 };
 
-#endif

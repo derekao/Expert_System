@@ -14,7 +14,7 @@
 
 /* CORE */
 
-Lexer::Lexer(std::string szFileName, std::vector< std::vector<Token> > & CVector) : 
+Lexer::Lexer(std::string szFileName, std::vector< std::vector<Token *> *> * CVector) : 
 			bError(false), CVectorToken(CVector)
 {
 	CFileStream = new std::ifstream(szFileName);
@@ -43,7 +43,7 @@ Lexer::Lexer(std::string szFileName, std::vector< std::vector<Token> > & CVector
 		}
 		else
 		{
-			std::cout << CVectorToken.size() << std::endl; 
+			// std::cout << CVectorToken->size() << std::endl;
 		}
 	}
 
@@ -78,7 +78,7 @@ void Lexer::CheckLineFormat(std::string & szLine, int iLine)
 
 void Lexer::LexLine(std::string szLine, int iLine)
 {
-	std::vector<Token> tmpVector;
+	std::vector<Token *> *tmpVector = new std::vector<Token *>;
 
 	for (size_t i = 0; i < szLine.length(); i++)
 	{
@@ -87,37 +87,37 @@ void Lexer::LexLine(std::string szLine, int iLine)
 		if (szLine[i] == '#')
 			break ;
 		else if (szLine[i] == '+')
-			tmpVector.push_back(Operator(TOKEN_AND));
+			tmpVector->push_back(new Operator(TOKEN_AND));
 		else if (szLine[i] == '|')
-			tmpVector.push_back(Operator(TOKEN_OR));
+			tmpVector->push_back(new Operator(TOKEN_OR));
 		else if (szLine[i] == '^')
-			tmpVector.push_back(Operator(TOKEN_XOR));
+			tmpVector->push_back(new Operator(TOKEN_XOR));
 		else if (szLine[i] == '!')
-			tmpVector.push_back(Operator(TOKEN_NEG));
+			tmpVector->push_back(new Operator(TOKEN_NEG));
 		else if (szLine[i] == '(')
-			tmpVector.push_back(Operator(TOKEN_OPEN));
+			tmpVector->push_back(new Operator(TOKEN_OPEN));
 		else if (szLine[i] == ')')
-			tmpVector.push_back(Operator(TOKEN_CLOSE));
+			tmpVector->push_back(new Operator(TOKEN_CLOSE));
 		else if (szLine[i] == '=' && szLine[i + 1] == '>')
 		{
-			tmpVector.push_back(Operator(TOKEN_IMPLY));
+			tmpVector->push_back(new Operator(TOKEN_IMPLY));
 			i++;
 		}
 		else if (szLine[i] == '<' && szLine[i + 1] == '=' && szLine[i + 2] == '>')
 		{
-			tmpVector.push_back(Operator(TOKEN_EQUAL));
+			tmpVector->push_back(new Operator(TOKEN_EQUAL));
 			i += 2;
 		}
 		else if (szLine[i] == '?')
-			tmpVector.push_back(Operator(TOKEN_QUERY));
+			tmpVector->push_back(new Operator(TOKEN_QUERY));
 		else if (szLine[i] == '=')
-			tmpVector.push_back(Operator(TOKEN_FACT));
+			tmpVector->push_back(new Operator(TOKEN_FACT));
 		else if (isupper(szLine[i]))
 		{
 			int j = i + 1;
 			while (islower(szLine[j]))
 				j++;
-			tmpVector.push_back(TokenFact(szLine.substr(i, j - i)));
+			tmpVector->push_back(new TokenFact(szLine.substr(i, j - i)));
 			i += j - i - 1;
 		}
 		else
@@ -128,5 +128,5 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			return ;
 		}
 	}
-	CVectorToken.push_back(tmpVector);
+	CVectorToken->push_back(tmpVector);
 }

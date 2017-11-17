@@ -14,6 +14,5 @@
 
 Fact::Fact(std::string & name) : szName(name)
 {
-	iState = FACT_FALSE;
-	bIsSet = false;
+	
 }

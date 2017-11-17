@@ -1,7 +1,8 @@
 NAME = Expert_System
 
 SRC = main.cpp Lexer.class.cpp Operator.class.cpp Token.class.cpp \
-		TokenFact.class.cpp
+		TokenFact.class.cpp Parser.class.cpp Link.class.cpp \
+		Instr.class.cpp		
 
 OBJ = $(addprefix $(O_DIR)/,$(SRC:.cpp=.o))
 
