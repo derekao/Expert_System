@@ -17,7 +17,7 @@ private:
 	Instr(void);
 
 public:
-	Instr();
+	// Instr();
 	~Instr(void) {};
 
 };

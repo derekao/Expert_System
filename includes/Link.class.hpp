@@ -1,6 +1,7 @@
 #pragma once
 
 # include "Instr.class.hpp"
+# include "vector"
 
 class Link
 {
@@ -10,7 +11,7 @@ private:
 	Link(void);
 
 public:
-	Link();
+	// Link();
 	~Link(void) {};
 
 };

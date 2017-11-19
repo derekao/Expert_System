@@ -34,8 +34,6 @@ private:
 	void CheckLineFormat(std::string & szLine, int iLine);
 	void LexLine(std::string szLine, int iLine);
 
-	void PrintMemory();
-
 public:
 	Lexer(std::string szFileName, std::vector< std::vector<Token *> *> *CVector);
 	~Lexer(void);
