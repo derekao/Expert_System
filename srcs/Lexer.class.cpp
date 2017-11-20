@@ -79,6 +79,7 @@ void Lexer::CheckLineFormat(std::string & szLine, int iLine)
 void Lexer::LexLine(std::string szLine, int iLine)
 {
 	std::vector<Token *> *tmpVector = new std::vector<Token *>;
+	bool bNeg = false;
 
 	for (size_t i = 0; i < szLine.length(); i++)
 	{
@@ -92,8 +93,15 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			tmpVector->push_back(new Operator(TOKEN_OR));
 		else if (szLine[i] == '^')
 			tmpVector->push_back(new Operator(TOKEN_XOR));
+		else if (szLine[i] == '!' && isupper(szLine[i + 1]))
+			bNeg = true;
 		else if (szLine[i] == '!')
-			tmpVector->push_back(new Operator(TOKEN_NEG));
+		{
+			bError = true;
+			VectorError.push_back("Negation error : " + szLine.substr(i, 1)
+					+ " at line : " + std::to_string(iLine));
+			return ;
+		}
 		else if (szLine[i] == '(')
 			tmpVector->push_back(new Operator(TOKEN_OPEN));
 		else if (szLine[i] == ')')
@@ -117,7 +125,8 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			int j = i + 1;
 			while (islower(szLine[j]))
 				j++;
-			tmpVector->push_back(new TokenFact(szLine.substr(i, j - i)));
+			tmpVector->push_back(new TokenFact(szLine.substr(i, j - i), bNeg));
+			bNeg = false;
 			i += j - i - 1;
 		}
 		else

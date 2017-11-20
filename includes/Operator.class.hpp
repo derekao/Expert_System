@@ -37,7 +37,7 @@ private:
 
 public:
 	Operator(int iID);
-	~Operator(void) {};
+	virtual ~Operator(void) {};
 
 	/* Accessors */
 	int iGetID(void) const;

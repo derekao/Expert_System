@@ -13,7 +13,7 @@
 #include "Token.class.hpp"
 #include "TokenFact.class.hpp"
 
-TokenFact::TokenFact(std::string szName) : Token(false), _szName(szName)
+TokenFact::TokenFact(std::string szName, bool Neg) : Token(false), _szName(szName), bNeg(Neg)
 {
 	return ;
 }

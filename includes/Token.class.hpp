@@ -24,7 +24,7 @@ private:
 
 public:
 	Token(bool bIsOperator);
-	~Token(void) {};
+	virtual ~Token(void) {};
 
 	/* Accessors */
 	bool bGetIsOperator(void) const;

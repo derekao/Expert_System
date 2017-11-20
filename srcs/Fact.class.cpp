@@ -12,7 +12,7 @@
 
 #include "Fact.class.hpp"
 
-Fact::Fact(std::string & name) : szName(name)
+Fact::Fact(std::string & name) : Link(), szName(name)
 {
 	
 }

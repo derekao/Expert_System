@@ -20,14 +20,16 @@ class TokenFact : public Token
 
 private:
 	std::string _szName;
+	bool 	bNeg;
 
 	TokenFact();
 
 public:
-	TokenFact(std::string szName);
-	~TokenFact(void) {};
+	TokenFact(std::string szName, bool Neg);
+	virtual ~TokenFact(void) {};
 
 	/*Accessors*/
 	std::string szGetName() const {return _szName;} ;
+	bool	bGetNeg() const { return bNeg; } ;
 
 };
