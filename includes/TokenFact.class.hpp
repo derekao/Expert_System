@@ -20,7 +20,6 @@ class TokenFact : public Token
 
 private:
 	std::string _szName;
-	bool 	bNeg;
 
 	TokenFact();
 
@@ -30,6 +29,5 @@ public:
 
 	/*Accessors*/
 	std::string szGetName() const {return _szName;} ;
-	bool	bGetNeg() const { return bNeg; } ;
 
 };

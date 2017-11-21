@@ -93,7 +93,7 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			tmpVector->push_back(new Operator(TOKEN_OR));
 		else if (szLine[i] == '^')
 			tmpVector->push_back(new Operator(TOKEN_XOR));
-		else if (szLine[i] == '!' && (isupper(szLine[i + 1]) || szLine[i])
+		else if (szLine[i] == '!' && (isupper(szLine[i + 1]) || szLine[i]))
 			bNeg = true;
 		else if (szLine[i] == '!')
 		{

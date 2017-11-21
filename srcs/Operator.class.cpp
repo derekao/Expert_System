@@ -14,13 +14,15 @@
 #include "Operator.class.hpp"
 
 /* CORE */
-Operator::Operator(int iID) : Token(true), _iID(iID), _bNeg(false)
+Operator::Operator(int iID) : Token(true), _iID(iID)
 {
+	_bNeg = false;
 	return ;
 }
 
-Operator::Operator(int iID, bool bNeg) : Token(true), _iID(iID), _bNeg(bNeg)
+Operator::Operator(int iID, bool bNeg) : Token(true), _iID(iID)
 {
+	_bNeg = bNeg;
 	return ;
 }
 
@@ -30,9 +32,9 @@ int Operator::iGetID(void) const
 	return (_iID);
 }
 
-int Operator::bGetNeg(void) const
-{
-	return (_bNeg);
-}
+// bool Operator::bGetNeg(void) const
+// {
+// 	return (_bNeg);
+// }
 
 

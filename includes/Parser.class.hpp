@@ -5,6 +5,7 @@
 # include "TokenFact.class.hpp"
 # include "Operator.class.hpp"
 # include "Fact.class.hpp"
+# include "TokenMixed.class.hpp"
 
 class Parser
 {
@@ -16,12 +17,8 @@ private:
 	void	splitLineToken(std::vector<Token *> *tokenLine);
 	std::vector<Token *> *ShuntingYardAlgo(std::vector<Token *> *Input);
 	void buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken);
-	Link * buildNode(std::vector<Token *> *input1, WTF);
-<<<<<<< HEAD
+	Fact * buildNode(std::vector<Token *> *input1, int way);
 	Fact * getFact(Token * token);
-=======
-	Fact * getFact(Token *token);
->>>>>>> 323eaecc4158e014cd5fa79c09177c1dcf14768d
 
 	void PrintMemory(std::vector<Token *> toto);
 

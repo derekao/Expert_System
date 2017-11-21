@@ -1,8 +1,8 @@
 # this is a comment$
 # all the required rules and symbols, along with the bonus ones, will be
 # shown here. spacing is not important
-!C => E # C implies E
-(A + B) + ( C  | Y )=> D # A and B and C implies D
+!C + B <=> E # C implies E
+(A + B) + ( C  | Y ) => D # A and B and C implies D
 A | B => C # A or B implies C
 A + !B => F # A and not B implies F
 C | !G => H # C or not G implies H

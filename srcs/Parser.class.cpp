@@ -22,6 +22,7 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	Operator *middleToken = NULL;
 	bool lineMiddle = false;
 
+//	std::cout << "0-----------------------------------------" << std::endl;
 	for (size_t i = 0; i < tokenLine->size(); i++)
 	{
 		if ((*tokenLine)[i]->bGetIsOperator())
@@ -31,19 +32,23 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 				lineMiddle = true;
 		}
 		if (lineMiddle && !middleToken)
-			middleToken = dynamic_cast<Operator *>tokenLine->at(i);
+			middleToken = dynamic_cast<Operator *>(tokenLine->at(i));
 		else if(!lineMiddle)
 			input1->push_back((*tokenLine)[i]);
 		else
 			input2->push_back((*tokenLine)[i]);
 	}
+//	std::cout << "01-----------------------------------------" << std::endl;
 	if (!input1->size() || !input2->size())
 	{
 		std::cerr << "Error : Wrong rule" << std::endl;
 		exit(0);
 	}
+	std::cout << "A-----------------------------------------" << std::endl;
 	input1 = ShuntingYardAlgo(input1);	
+	std::cout << "B-----------------------------------------" << std::endl;
 	input2 = ShuntingYardAlgo(input2);
+	std::cout << "C-----------------------------------------" << std::endl;
 	buildGraph(input1, input2, middleToken);
 
 }
@@ -53,7 +58,7 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 	std::vector<Token *> *Output = new std::vector<Token *>;
 	std::vector<Token *> Stack;
 	Token *tmp;
-	int iNbNeg = 0;
+	size_t iNbNeg = 0;
 	bool bNeg = false;
 
 	for (size_t i = 0; i < Input->size(); i++)
@@ -98,7 +103,7 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 			delete tmp;
 			for	(size_t j = 0; j < iNbNeg; j++)
 			{
-				(dynamic_cast<Operator *>(Output->at(Output->size() - j)))->SetNeg(bNeg);
+				(dynamic_cast<Operator *>(Output->at(Output->size() - j - 1)))->SetNeg(bNeg);
 			}
 		}
 	}
@@ -121,61 +126,87 @@ void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *inpu
 {
 	Fact * wayIn;
 	Fact * wayOut;
-ok
+	Instr *instr;
+
+	std::cout << "2-----------------------------------------" << std::endl;
 	if (middleToken->iGetID() == TOKEN_EQUAL)
 	{
+		std::cout << "2.1-----------------------------------------" << std::endl;
 		wayIn = buildNode(input1, WAY_EQUAL);
 		wayOut = buildNode(input2, WAY_EQUAL);
+		instr = new Instr(wayIn, NULL, wayOut, TOKEN_EQUAL, WAY_EQUAL);
 	}
 	else
 	{
-		wayIn = buildNode(input1, WAY_EQUAL);
-		wayOut = buildNode(input2, WAY_EQUAL);
+		std::cout << "2.21-----------------------------------------" << std::endl;
+		wayIn = buildNode(input1, WAY_DOWN);
+		std::cout << "2.22-----------------------------------------" << std::endl;
+		wayOut = buildNode(input2, WAY_UP);
+		std::cout << "2.23-----------------------------------------" << std::endl;
+		instr = new Instr(wayIn, NULL, wayOut, TOKEN_IMPLY, WAY_DOWN);
+		std::cout << "2.24-----------------------------------------" << std::endl;
 	}
+	std::cout << "3-----------------------------------------" << std::endl;
+	wayIn->tabLink.push_back(instr);
+	std::cout << "4-----------------------------------------" << std::endl;
+	wayOut->tabLink.push_back(instr);
+	std::cout << "5-----------------------------------------" << std::endl;
+//	CheckRuleRight(); TODO
 }
 
-Fact * Parser::buildNode(std::vector<Token *> *input, WTF)
+Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)
 {
 	Fact *fact1;
 	Fact *fact2;
 	Fact *next;
+
+	Token *token1;
+	Token *token2;
 	Operator *op;
+	
 	Instr *instr;
 	TokenMixed *concatToken;
 
 	size_t i = 0;
+	std::cout << "Node1-----------------------------------------" << std::endl;
 	if (input->size() == 1)
-	{ // TODO
-		return input->back();
+	{
+		return getFact(input->back());
 	}
-	while (!input->at(i++)->bGetIsOperator())
-		;
+	while (!input->at(i)->bGetIsOperator())
+		i++;
+	std::cout << "Node2----------------------------------------- et = " << i << "et" << input->size() << std::endl;
 	if (i < 2)
 	{
-		std::err << "Operator without any Fact isn't very smart :')" << std::endl;
+		std::cerr << "Operator without any Fact isn't very smart :')" << std::endl;
 		exit(0);
 	}
+	std::cout << "Node3----------------------------------------- = " << i << " et " << input->size() << std::endl;
 	op = dynamic_cast<Operator *>(input->at(i));
 	fact1 = getFact(input->at(i - 2));
 	fact2 = getFact(input->at(i - 1));
-	next = new Fact("");
+	next = new Fact();
 	concatToken = new TokenMixed(op->bGetNeg(), next);
-	input->erase(i - 2, i);
-	input->insert(i, concatToken);
-<<<<<<< HEAD
-	instr = new Instr(fact1, fact2, next, op->iGetID(), );
-
-}
-
-Fact * Parser::getFact(Token * token)
-=======
-	instr = new Instr(fact1, fact2, next, )
-
-
+	std::cout << "Node4.1-----------------------------------------" << std::endl;
+	token1 = input->at(i - 2);
+	token2 = input->at(i - 1);
+	input->erase(input->begin() + i - 2, input->begin() + i);
+	std::cout << "Node4.2-----------------------------------------" << std::endl;
+	i -= 2;
+	input->insert(input->begin() + i, concatToken);
+	std::cout << "Node4.3-----------------------------------------" << std::endl;
+	instr = new Instr(fact1, fact2, next, op->iGetID(), iWay);
+	std::cout << "Node4.4-----------------------------------------" << std::endl;
+	instr->SetNeg(token1->bGetNeg(),token2->bGetNeg(),op->bGetNeg());
+	std::cout << "Node5-----------------------------------------" << std::endl;
+	fact1->tabLink.push_back(instr);
+	fact2->tabLink.push_back(instr);
+	next->tabLink.push_back(instr);
+	std::cout << "Node6----------------------------------------- et = " << input->size() << std::endl;
+	return buildNode(input, iWay);
 }
 
 Fact * Parser::getFact(Token *token)
->>>>>>> 323eaecc4158e014cd5fa79c09177c1dcf14768d
 {
 	if (!token->bGetIsMixed())
 	{
@@ -189,9 +220,8 @@ Fact * Parser::getFact(Token *token)
 	}
 	else
 	{
-		return new Fact("");
+		return dynamic_cast<TokenMixed *>(token)->getFact();
 	}
-
 }
 
 void Parser::PrintMemory(std::vector<Token *> toto)

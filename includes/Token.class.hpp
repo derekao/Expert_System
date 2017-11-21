@@ -23,11 +23,16 @@ private:
 
 	Token(void);
 
+protected:
+	bool _bNeg;
+
 public:
 	Token(bool bIsOperator);
+	Token(bool bIsOperator, bool bIsMixed);
 	virtual ~Token(void) {};
 
 	/* Accessors */
 	bool bGetIsOperator(void) const;
 	bool bGetIsMixed(void) const;
+	bool bGetNeg() const { return _bNeg; } ;
 };

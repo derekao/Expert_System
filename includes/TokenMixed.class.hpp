@@ -13,14 +13,13 @@
 #pragma once
 
 #include <iostream>
-#include "Token.class.hpp"
 #include "Fact.class.hpp"
+#include "Token.class.hpp"
 
 class TokenMixed : public Token
 {
 
 private:
-	bool 	bNeg;
 	Fact 	*_fact;
 
 	TokenMixed();
@@ -30,7 +29,6 @@ public:
 	virtual ~TokenMixed(void) {};
 
 	/*Accessors*/
-	bool	bGetNeg() const { return bNeg; } ;
-	bool	getFact() const { return _fact; } ;
+	Fact	*getFact() const { return _fact; } ;
 
 };

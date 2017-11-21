@@ -12,12 +12,12 @@
 
 #include "Fact.class.hpp"
 
-Fact::Fact(std::string & name, bool abstract) : szName(name), bAbstract(abstract)
+Fact::Fact(std::string & name) : szName(name)
 {
 	
 }
 
-Fact::Fact(std::string & name) : szName(name)
+Fact::Fact() : szName("")
 {
 	
 }

@@ -32,7 +32,6 @@ class Operator : public Token
 	
 private:
 	int _iID;
-	bool _bNeg;
 
 	Operator(void);
 
@@ -43,7 +42,6 @@ public:
 
 	/* Accessors */
 	int iGetID(void) const;
-	bool bGetNeg(void) const;
 
 	void SetNeg(bool bNeg) { _bNeg = bNeg; } ;
 

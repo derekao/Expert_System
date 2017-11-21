@@ -13,23 +13,21 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include "Instr.class.hpp"
 
 class Fact
 {
 
 private:
-	std::vector<Instr> tabLink;
-
 	std::string const szName;
-	bool	bAbstract;
-	Fact();
 
 public:
-	Fact(std::string & name, bool abstract);
 	Fact(std::string & name);
+	Fact();
 	~Fact() {} ;
 
-	std::string getName() { return szName; };
-	bool 	getAbstract() { return bAbstract; };
+	std::vector<Instr *> tabLink;
+
+	std::string szGetName() { return szName; };
 };
