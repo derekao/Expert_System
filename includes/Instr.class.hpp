@@ -1,23 +1,26 @@
 #pragma once
 
-class Link;
+class Fact;
 
 class Instr
 {
 private:
-	Link *firstLink;
-	Link *SecLink;
-	Link *previous;
+	Fact *firstLink;
+	Fact *SecLink;
+	Fact *next;
 	int iOperator;
 	int iWay;
 	bool bNegOne;
 	bool bNegTwo;
-	bool bNegPrev;
+	bool bNegNext;
 
 	Instr(void);
 
 public:
-	// Instr();
+	Instr(Fact *fL, Fact *sL, Fact *next, int Op, int way);
+
+	void SetNeg(bool first, bool snd, bool next);
+
 	~Instr(void) {};
 
 };

@@ -1,35 +1,36 @@
 // ************************************************************************** //
 //                                                                            //
 //                                                        :::      ::::::::   //
-//   Fact.class.hpp                                     :+:      :+:    :+:   //
+//   TokenMixed.class.hpp                               :+:      :+:    :+:   //
 //                                                    +:+ +:+         +:+     //
 //   By: semartin <marvin@42.fr>                    +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
-//   Created: 2017/11/16 15:29:27 by semartin          #+#    #+#             //
-//   Updated: 2017/11/16 15:29:27 by semartin         ###   ########.fr       //
+//   Created: 2017/11/20 16:49:44 by semartin          #+#    #+#             //
+//   Updated: 2017/11/20 16:49:44 by semartin         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
- 
+
 #pragma once
 
 #include <iostream>
-#include "Instr.class.hpp"
+#include "Token.class.hpp"
+#include "Fact.class.hpp"
 
-class Fact
+class TokenMixed : public Token
 {
 
 private:
-	std::vector<Instr> tabLink;
+	bool 	bNeg;
+	Fact 	*_fact;
 
-	std::string const szName;
-	bool	bAbstract;
-	Fact();
+	TokenMixed();
 
 public:
-	Fact(std::string & name, bool abstract);
-	Fact(std::string & name);
-	~Fact() {} ;
+	TokenMixed(bool Neg, Fact *fact);
+	virtual ~TokenMixed(void) {};
 
-	std::string getName() { return szName; };
-	bool 	getAbstract() { return bAbstract; };
+	/*Accessors*/
+	bool	bGetNeg() const { return bNeg; } ;
+	bool	getFact() const { return _fact; } ;
+
 };

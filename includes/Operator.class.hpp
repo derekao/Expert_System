@@ -32,15 +32,20 @@ class Operator : public Token
 	
 private:
 	int _iID;
+	bool _bNeg;
 
 	Operator(void);
 
 public:
 	Operator(int iID);
+	Operator(int iID, bool bNeg);
 	virtual ~Operator(void) {};
 
 	/* Accessors */
 	int iGetID(void) const;
+	bool bGetNeg(void) const;
+
+	void SetNeg(bool bNeg) { _bNeg = bNeg; } ;
 
 	int iGetPrecedence(void); //TODO
 };

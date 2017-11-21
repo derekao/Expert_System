@@ -1,6 +1,6 @@
 #include "Parser.class.hpp"
 
-Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact> link) 
+Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> link) 
 			: CVectorToken(CVector), FactTab(link)
 {
 	for (size_t i = 0; i < CVectorToken->size(); i++)
@@ -26,13 +26,13 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	{
 		if ((*tokenLine)[i]->bGetIsOperator())
 		{
-			Operator* tmp = reinterpret_cast<Operator *>((*tokenLine)[i]);
+			Operator* tmp = dynamic_cast<Operator *>((*tokenLine)[i]);
 			if (tmp->iGetID() == TOKEN_IMPLY || tmp->iGetID() == TOKEN_EQUAL)
 				lineMiddle = true;
 		}
 		if (lineMiddle && !middleToken)
 			middleToken = tokenLine->at(i);
-		else else if (!lineMiddle)
+		else if(!lineMiddle)
 			input1->push_back((*tokenLine)[i]);
 		else
 			input2->push_back((*tokenLine)[i]);
@@ -44,7 +44,8 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	}
 	input1 = ShuntingYardAlgo(input1);	
 	input2 = ShuntingYardAlgo(input2);
-	buildGraph(intput1, input2, middleToken);
+	buildGraph(input1, input2, middleToken);
+
 }
 
 std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
@@ -52,30 +53,34 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 	std::vector<Token *> *Output = new std::vector<Token *>;
 	std::vector<Token *> Stack;
 	Token *tmp;
+	int iNbNeg = 0;
+	bool bNeg = false;
 
 	for (size_t i = 0; i < Input->size(); i++)
 	{
 		if (!Input->at(i)->bGetIsOperator())
 			Output->push_back(Input->at(i));
 		else if (Input->at(i)->bGetIsOperator() 
-			&& (reinterpret_cast<Operator *>(Input->at(i)))->iGetID() >= TOKEN_AND
-			&& (reinterpret_cast<Operator *>(Input->at(i)))->iGetID() <= TOKEN_XOR) 
+			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() >= TOKEN_AND
+			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() <= TOKEN_XOR) 
 		{
 			Stack.push_back(Input->at(i));
 		}
 		else if (Input->at(i)->bGetIsOperator() 
-			&& (reinterpret_cast<Operator *>(Input->at(i)))->iGetID() == TOKEN_OPEN)
+			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() == TOKEN_OPEN)
 		{
 			Stack.push_back(Input->at(i));
 		}
 		else if (Input->at(i)->bGetIsOperator() 
-			&& (reinterpret_cast<Operator *>(Input->at(i)))->iGetID() == TOKEN_CLOSE)
+			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() == TOKEN_CLOSE)
 		{
+			iNbNeg = 0;
 			while (Stack.size() 
-				&& (reinterpret_cast<Operator *>(Stack.back()))->iGetID() != TOKEN_OPEN)
+				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() != TOKEN_OPEN)
 			{
 				Output->push_back(Stack.back());
 				Stack.pop_back();
+				iNbNeg ++;
 			}
 			if (!Stack.size())
 			{
@@ -84,17 +89,22 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 			}
 			else
 			{
+				bNeg = true;
 				tmp = Stack.back();
 				Stack.pop_back();
 				delete tmp;
 			}
 			tmp = Input->at(i);
 			delete tmp;
+			for	(size_t j = 0; j < iNbNeg; j++)
+			{
+				(dynamic_cast<Operator *>(Output->at(Output->size() - j)))->SetNeg(bNeg);
+			}
 		}
 	}
 	while (Stack.size())
 	{
-		if ((reinterpret_cast<Operator *>(Stack.back()))->iGetID() == TOKEN_OPEN)
+		if ((dynamic_cast<Operator *>(Stack.back()))->iGetID() == TOKEN_OPEN)
 		{
 			std::cerr << "There are mismatched opened parentheses" << std::endl;
 			exit(0);
@@ -109,29 +119,54 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 
 void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Token *middleToken)
 {
-	Link * wayIn;
-	Link * wayOut;
+	Fact * wayIn;
+	Fact * wayOut;
 
 	wayIn = buildNode(input1, WTF);
 	wayOut = buildNode(input2, WTF);
 }
 
-Link * Parser::buildNode(std::vector<Token *> *input, WTF)
+Fact * Parser::buildNode(std::vector<Token *> *input, WTF)
 {
-	Link *tmpLink = new Link;
-	Instr *tmpInstr = new Instr;
+	Fact *fact1;
+	Fact *fact2;
+	Fact *next;
+	Operator *op;
+	Instr *instr;
+	TokenMixed *concatToken;
 
 	size_t i = 0;
 	if (input->size() == 1)
+	{ // TODO
 		return input->back();
+	}
 	while (!input->at(i++)->bGetIsOperator())
 		;
 	if (i < 2)
 	{
-		std::err < "Operator without any Fact isn't very smart :')" << std::endl;
+		std::err << "Operator without any Fact isn't very smart :')" << std::endl;
 		exit(0);
 	}
+	op = dynamic_cast<Operator *>(input->at(i));
+	fact1 = getFact(input->at(i - 2));
+	fact2 = getFact(input->at(i - 1));
+	next = new Fact("");
+	concatToken = new TokenMixed(op->bGetNeg() ,next);
+	input->erase(i - 2, i);
+	input->insert(i, concatToken);
+
 	
+
+}
+
+Fact * Parser::getFact(std::string & szName)
+{
+	for (size_t i = 0; i < FactTab.size(); i++)
+	{
+		if (szName == FactTab[i]->szGetName())
+			return FactTab[i];
+	}
+	return new Fact(szName);
 
 }
 
@@ -141,12 +176,12 @@ void Parser::PrintMemory(std::vector<Token *> toto)
 	{
 		if (toto[i]->bGetIsOperator())
 		{
-			std::cout << "Operator is = " << (reinterpret_cast<Operator *>(toto[i]))->iGetID() << std::endl;
+			std::cout << "Operator is = " << (dynamic_cast<Operator *>(toto[i]))->iGetID() << std::endl;
 		}
 		else
 		{
-			std::cout << "FactName is = " << (reinterpret_cast<TokenFact *>(toto[i]))->szGetName() << 
-				" And is neg? =" << (reinterpret_cast<TokenFact *>(toto[i]))->bGetNeg() << std::endl;
+			std::cout << "FactName is = " << (dynamic_cast<TokenFact *>(toto[i]))->szGetName() << 
+				" And is neg? =" << (dynamic_cast<TokenFact *>(toto[i]))->bGetNeg() << std::endl;
 		}
 	}
 	std::cout << "||||||||||||||||||||" << std::endl;

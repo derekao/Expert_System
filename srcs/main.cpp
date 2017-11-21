@@ -18,7 +18,7 @@ int main(int ac, char **av)
 	if (ac == 2)
 	{
 		std::vector< std::vector<Token *> *> CVectorToken;
-		std::vector<Fact> TabFact;
+		std::vector<Fact *> TabFact;
 
 		Lexer(std::string(av[1]), &CVectorToken);
 		Parser(&CVectorToken, TabFact);
