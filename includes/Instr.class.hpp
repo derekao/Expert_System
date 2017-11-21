@@ -1,5 +1,10 @@
 #pragma once
 
+#define WAY_EQUAL 0
+#define WAY_DOWN 1
+#define WAY_UP 2
+
+
 class Fact;
 
 class Instr

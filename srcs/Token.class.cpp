@@ -13,7 +13,12 @@
 #include "Token.class.hpp"
 
 /* CORE */
-Token::Token(bool bIsOperator) : _bIsOperator(bIsOperator)
+Token::Token(bool bIsOperator) : _bIsOperator(bIsOperator), _bIsMixed(false)
+{
+	return ;
+}
+
+Token::Token(bool bIsOperator, bool bIsMixed) : _bIsOperator(bIsOperator), _bIsMixed(bIsMixed)
 {
 	return ;
 }
@@ -24,5 +29,9 @@ bool Token::bGetIsOperator(void) const
 	return (_bIsOperator);
 }
 
+bool Token::bGetIsMixed(void) const
+{
+	return (_bIsMixed);
+}
 
 

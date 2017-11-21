@@ -19,7 +19,7 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 {
 	std::vector<Token *> *input1 = new std::vector<Token *>;
 	std::vector<Token *> *input2 = new std::vector<Token *>;
-	Token *middleToken = NULL;
+	Operator *middleToken = NULL;
 	bool lineMiddle = false;
 
 	for (size_t i = 0; i < tokenLine->size(); i++)
@@ -31,7 +31,7 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 				lineMiddle = true;
 		}
 		if (lineMiddle && !middleToken)
-			middleToken = tokenLine->at(i);
+			middleToken = dynamic_cast<Operator *>tokenLine->at(i);
 		else if(!lineMiddle)
 			input1->push_back((*tokenLine)[i]);
 		else
@@ -117,13 +117,21 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 
 }
 
-void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Token *middleToken)
+void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken)
 {
 	Fact * wayIn;
 	Fact * wayOut;
-
-	wayIn = buildNode(input1, WTF);
-	wayOut = buildNode(input2, WTF);
+ok
+	if (middleToken->iGetID() == TOKEN_EQUAL)
+	{
+		wayIn = buildNode(input1, WAY_EQUAL);
+		wayOut = buildNode(input2, WAY_EQUAL);
+	}
+	else
+	{
+		wayIn = buildNode(input1, WAY_EQUAL);
+		wayOut = buildNode(input2, WAY_EQUAL);
+	}
 }
 
 Fact * Parser::buildNode(std::vector<Token *> *input, WTF)
@@ -154,19 +162,26 @@ Fact * Parser::buildNode(std::vector<Token *> *input, WTF)
 	concatToken = new TokenMixed(op->bGetNeg() ,next);
 	input->erase(i - 2, i);
 	input->insert(i, concatToken);
-
-	
+	instr = new Instr(fact1, fact2, next, op->iGetID(), );
 
 }
 
-Fact * Parser::getFact(std::string & szName)
+Fact * Parser::getFact(Token * token)
 {
-	for (size_t i = 0; i < FactTab.size(); i++)
+	if (!token->bGetIsMixed())
 	{
-		if (szName == FactTab[i]->szGetName())
-			return FactTab[i];
+		std::string szTmp = dynamic_cast<TokenFact *>(token)->szGetName();
+		for (size_t i = 0; i < FactTab.size(); i++)
+		{
+			if (szTmp == FactTab[i]->szGetName())
+				return FactTab[i];
+		}
+		return new Fact(szTmp);
 	}
-	return new Fact(szName);
+	else
+	{
+		return new Fact("");
+	}
 
 }
 

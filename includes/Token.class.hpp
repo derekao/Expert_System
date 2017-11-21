@@ -19,6 +19,7 @@ class Token
 	
 private:
 	bool _bIsOperator;
+	bool _bIsMixed;
 
 	Token(void);
 
@@ -28,4 +29,5 @@ public:
 
 	/* Accessors */
 	bool bGetIsOperator(void) const;
+	bool bGetIsMixed(void) const;
 };

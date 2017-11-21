@@ -13,7 +13,7 @@
 #include "Token.class.hpp"
 #include "TokenMixed.class.hpp"
 
-TokenFact::TokenFact(bool Neg, Fact *fact) : Token(false),  bNeg(Neg), _fact(fact)
+TokenFact::TokenFact(bool Neg, Fact *fact) : Token(false, true),  bNeg(Neg), _fact(fact)
 {
 	return ;
 }
