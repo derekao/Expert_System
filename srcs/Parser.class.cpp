@@ -151,15 +151,15 @@ Fact * Parser::buildNode(std::vector<Token *> *input, WTF)
 	fact1 = getFact(input->at(i - 2));
 	fact2 = getFact(input->at(i - 1));
 	next = new Fact("");
-	concatToken = new TokenMixed(op->bGetNeg() ,next);
+	concatToken = new TokenMixed(op->bGetNeg(), next);
 	input->erase(i - 2, i);
 	input->insert(i, concatToken);
+	instr = new Instr(fact1, fact2, next, )
 
-	
 
 }
 
-Fact * Parser::getFact(std::string & szName)
+Fact * Parser::getFact(Token *token)
 {
 	for (size_t i = 0; i < FactTab.size(); i++)
 	{

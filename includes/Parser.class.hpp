@@ -17,7 +17,7 @@ private:
 	std::vector<Token *> *ShuntingYardAlgo(std::vector<Token *> *Input);
 	void buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Token *middleToken);
 	Link * buildNode(std::vector<Token *> *input1, WTF);
-	Fact * getFact(std::string & szName);
+	Fact * getFact(Token *token);
 
 	void PrintMemory(std::vector<Token *> toto);
 
