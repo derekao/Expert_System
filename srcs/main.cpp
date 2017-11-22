@@ -21,6 +21,9 @@ int main(int ac, char **av)
 		std::vector<Fact *> TabFact;
 
 		Lexer(std::string(av[1]), &CVectorToken);
-		Parser(&CVectorToken, TabFact);
+		Parser tmp = Parser(&CVectorToken, TabFact);
+//		tmp.PrintGraph();
+
+
 	}
 }

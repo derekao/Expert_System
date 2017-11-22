@@ -26,6 +26,19 @@ public:
 
 	void SetNeg(bool first, bool snd, bool next);
 
+	//Accessor
+	Fact * getFirstLink() { return firstLink; };
+	Fact * getSecLink() { return SecLink; };
+	Fact * getNext() { return next; };
+
+	int iGetOperator() { return iOperator; } ;
+	int iGetWay() { return iWay; } ;
+
+	bool bGetNegOne() { return bNegOne; } ;
+	bool bGetNegTwo() { return bNegTwo; } ;
+	bool bGetNegNext() { return bNegNext; } ;
+
+
 	~Instr(void) {};
 
 };

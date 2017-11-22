@@ -21,8 +21,11 @@ private:
 	Fact * getFact(Token * token);
 
 	void PrintMemory(std::vector<Token *> toto);
+	void PrintFactTab();
+	void PrintNode(Fact * fact, Instr * instr);
 
 public:
+	void PrintGraph();
 	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *>);
 	~Parser(void) {};
 };

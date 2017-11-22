@@ -13,6 +13,7 @@ Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *
 		}
 		splitLineToken((*CVectorToken)[i]);
 	}
+//	PrintGraph();
 }
 
 void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
@@ -22,7 +23,6 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	Operator *middleToken = NULL;
 	bool lineMiddle = false;
 
-//	std::cout << "0-----------------------------------------" << std::endl;
 	for (size_t i = 0; i < tokenLine->size(); i++)
 	{
 		if ((*tokenLine)[i]->bGetIsOperator())
@@ -38,17 +38,13 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 		else
 			input2->push_back((*tokenLine)[i]);
 	}
-//	std::cout << "01-----------------------------------------" << std::endl;
 	if (!input1->size() || !input2->size())
 	{
 		std::cerr << "Error : Wrong rule" << std::endl;
 		exit(0);
 	}
-	std::cout << "A-----------------------------------------" << std::endl;
 	input1 = ShuntingYardAlgo(input1);	
-	std::cout << "B-----------------------------------------" << std::endl;
 	input2 = ShuntingYardAlgo(input2);
-	std::cout << "C-----------------------------------------" << std::endl;
 	buildGraph(input1, input2, middleToken);
 
 }
@@ -69,6 +65,14 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() >= TOKEN_AND
 			&& (dynamic_cast<Operator *>(Input->at(i)))->iGetID() <= TOKEN_XOR) 
 		{
+			while (Stack.size()
+				&& Stack.back()->bGetIsOperator() 
+				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() >= TOKEN_AND
+				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() <= TOKEN_XOR)
+			{
+				Output->push_back(Stack.back());
+				Stack.pop_back();
+			}
 			Stack.push_back(Input->at(i));
 		}
 		else if (Input->at(i)->bGetIsOperator() 
@@ -128,29 +132,20 @@ void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *inpu
 	Fact * wayOut;
 	Instr *instr;
 
-	std::cout << "2-----------------------------------------" << std::endl;
 	if (middleToken->iGetID() == TOKEN_EQUAL)
 	{
-		std::cout << "2.1-----------------------------------------" << std::endl;
 		wayIn = buildNode(input1, WAY_EQUAL);
 		wayOut = buildNode(input2, WAY_EQUAL);
 		instr = new Instr(wayIn, NULL, wayOut, TOKEN_EQUAL, WAY_EQUAL);
 	}
 	else
 	{
-		std::cout << "2.21-----------------------------------------" << std::endl;
 		wayIn = buildNode(input1, WAY_DOWN);
-		std::cout << "2.22-----------------------------------------" << std::endl;
 		wayOut = buildNode(input2, WAY_UP);
-		std::cout << "2.23-----------------------------------------" << std::endl;
 		instr = new Instr(wayIn, NULL, wayOut, TOKEN_IMPLY, WAY_DOWN);
-		std::cout << "2.24-----------------------------------------" << std::endl;
 	}
-	std::cout << "3-----------------------------------------" << std::endl;
 	wayIn->tabLink.push_back(instr);
-	std::cout << "4-----------------------------------------" << std::endl;
 	wayOut->tabLink.push_back(instr);
-	std::cout << "5-----------------------------------------" << std::endl;
 //	CheckRuleRight(); TODO
 }
 
@@ -168,41 +163,32 @@ Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)
 	TokenMixed *concatToken;
 
 	size_t i = 0;
-	std::cout << "Node1-----------------------------------------" << std::endl;
 	if (input->size() == 1)
 	{
 		return getFact(input->back());
 	}
 	while (!input->at(i)->bGetIsOperator())
 		i++;
-	std::cout << "Node2----------------------------------------- et = " << i << "et" << input->size() << std::endl;
 	if (i < 2)
 	{
 		std::cerr << "Operator without any Fact isn't very smart :')" << std::endl;
 		exit(0);
 	}
-	std::cout << "Node3----------------------------------------- = " << i << " et " << input->size() << std::endl;
 	op = dynamic_cast<Operator *>(input->at(i));
 	fact1 = getFact(input->at(i - 2));
 	fact2 = getFact(input->at(i - 1));
 	next = new Fact();
 	concatToken = new TokenMixed(op->bGetNeg(), next);
-	std::cout << "Node4.1-----------------------------------------" << std::endl;
 	token1 = input->at(i - 2);
 	token2 = input->at(i - 1);
-	input->erase(input->begin() + i - 2, input->begin() + i);
-	std::cout << "Node4.2-----------------------------------------" << std::endl;
+	input->erase(input->begin() + i - 2, input->begin() + i + 1);
 	i -= 2;
 	input->insert(input->begin() + i, concatToken);
-	std::cout << "Node4.3-----------------------------------------" << std::endl;
 	instr = new Instr(fact1, fact2, next, op->iGetID(), iWay);
-	std::cout << "Node4.4-----------------------------------------" << std::endl;
 	instr->SetNeg(token1->bGetNeg(),token2->bGetNeg(),op->bGetNeg());
-	std::cout << "Node5-----------------------------------------" << std::endl;
 	fact1->tabLink.push_back(instr);
 	fact2->tabLink.push_back(instr);
 	next->tabLink.push_back(instr);
-	std::cout << "Node6----------------------------------------- et = " << input->size() << std::endl;
 	return buildNode(input, iWay);
 }
 
@@ -216,7 +202,9 @@ Fact * Parser::getFact(Token *token)
 			if (szTmp == FactTab[i]->szGetName())
 				return FactTab[i];
 		}
-		return new Fact(szTmp);
+		Fact * tmpFact = new Fact(szTmp);
+		FactTab.push_back(tmpFact);
+		return tmpFact;
 	}
 	else
 	{
@@ -224,11 +212,65 @@ Fact * Parser::getFact(Token *token)
 	}
 }
 
+void Parser::PrintGraph()
+{
+	for (size_t i = 0; FactTab.size() > i; i++)
+	{
+		std::cout << "Maillion N° "<< FactTab[i]->szGetName() << std::endl;
+		for (size_t j = 0; j < FactTab[i]->tabLink.size(); j++)
+		{
+			std::cout << "1st Link = " << FactTab[i]->tabLink[j]->getFirstLink()->szGetName() << std::endl;
+			if (FactTab[i]->tabLink[j]->getSecLink())
+				std::cout << "2nd Link = " << FactTab[i]->tabLink[j]->getSecLink()->szGetName() << std::endl;
+			std::cout << "Next = " << FactTab[i]->tabLink[j]->getNext()->szGetName() << std::endl;
+			std::cout << "Operator = " << FactTab[i]->tabLink[j]->iGetOperator() << std::endl;
+			std::cout << "Way = " << FactTab[i]->tabLink[j]->iGetWay() << std::endl;
+			PrintNode(FactTab[i]->tabLink[j]->getNext(), FactTab[i]->tabLink[j]);
+			std::cout << "____________________++++++++++_________________________________" << std::endl;
+		}
+	}
+}
+
+void Parser::PrintNode(Fact * fact, Instr * instr)
+{
+	if (fact->szGetName() != "")
+		return;
+
+	std::cout << "1------------------------------------------------- Fact = " << fact << std::endl;
+	for (size_t i = 0; i < fact->tabLink.size(); i++)
+	{
+		if (instr == fact->tabLink[i])
+			continue ;
+
+		std::cout << "1st Link = " << fact->tabLink[i]->getFirstLink()->szGetName() << std::endl;
+		if (fact->tabLink[i]->getSecLink())
+			std::cout << "2nd Link = " << fact->tabLink[i]->getSecLink()->szGetName() << std::endl;
+		std::cout << "Next = " << fact->tabLink[i]->getNext()->szGetName() << std::endl;
+		std::cout << "Operator = " << fact->tabLink[i]->iGetOperator() << std::endl;
+		std::cout << "Way = " << fact->tabLink[i]->iGetWay() << std::endl;
+		if (fact->tabLink[i]->getNext() != fact)
+			PrintNode(fact->tabLink[i]->getNext(), fact->tabLink[i]);
+		std::cout << "2----------------------------------------------------" << std::endl;
+	}
+}
+
+void Parser::PrintFactTab()
+{
+	for (size_t i = 0; FactTab.size() > i; i++)
+	{
+		std::cout << FactTab[i]->szGetName() << std::endl;
+	}
+}
+
 void Parser::PrintMemory(std::vector<Token *> toto)
 {
 	for (size_t i = 0; i < toto.size(); i++)
 	{
-		if (toto[i]->bGetIsOperator())
+		if (toto[i]->bGetIsMixed())
+		{
+			std::cout << "Mixed Token here" << std::endl;
+		}
+		else if (toto[i]->bGetIsOperator())
 		{
 			std::cout << "Operator is = " << (dynamic_cast<Operator *>(toto[i]))->iGetID() << std::endl;
 		}
@@ -240,3 +282,4 @@ void Parser::PrintMemory(std::vector<Token *> toto)
 	}
 	std::cout << "||||||||||||||||||||" << std::endl;
 }
+
