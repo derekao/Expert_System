@@ -13,7 +13,7 @@ Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *
 		}
 		splitLineToken((*CVectorToken)[i]);
 	}
-//	PrintGraph();
+	PrintGraph();
 }
 
 void	Parser::splitLineToken(std::vector<Token *> *tokenLine)

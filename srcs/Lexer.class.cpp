@@ -41,10 +41,6 @@ Lexer::Lexer(std::string szFileName, std::vector< std::vector<Token *> *> * CVec
 				std::cerr << VectorError[i] << std::endl;
 			}
 		}
-		else
-		{
-			// std::cout << CVectorToken->size() << std::endl;
-		}
 	}
 
 	return ;
@@ -61,14 +57,14 @@ void Lexer::CheckLineFormat(std::string & szLine, int iLine)
 
 	while (isspace(szLine[i]))
 		i++;
-
+	if (!szLine[i])
+		return ;
 	switch (szLine[i])
 	{
 		case '#' :
 		{
 			break;
 		}
-
 		default :
 		{
 			LexLine(szLine.substr(i), iLine);

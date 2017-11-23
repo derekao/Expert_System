@@ -11,7 +11,7 @@
 // ************************************************************************** //
 
 #include "Lexer.class.hpp"
-# include "Parser.class.hpp"
+#include "Parser.class.hpp"
 
 int main(int ac, char **av)
 {
@@ -22,7 +22,7 @@ int main(int ac, char **av)
 
 		Lexer(std::string(av[1]), &CVectorToken);
 		Parser tmp = Parser(&CVectorToken, TabFact);
-//		tmp.PrintGraph();
+		// tmp.PrintGraph();
 
 
 	}
