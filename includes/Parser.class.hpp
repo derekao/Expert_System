@@ -11,7 +11,8 @@ class Parser
 {
 private:
 	std::vector< std::vector<Token *> *> *CVectorToken;
-	std::vector<Fact *> FactTab;
+	std::vector<Fact *> *FactTab;
+	std::vector<std::string> nodeValueTab;
 
 	Parser(void);
 	void	splitLineToken(std::vector<Token *> *tokenLine);
@@ -19,6 +20,9 @@ private:
 	void buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken);
 	Fact * buildNode(std::vector<Token *> *input1, int way);
 	Fact * getFact(Token * token);
+	void ParseNodeValue(std::vector<Token *> *tokenTab);
+	void SetNodeValue();
+	void ParseQuery(std::vector<Token *> *tokenTab, std::vector<std::string> *tabQuery);
 
 	void PrintMemory(std::vector<Token *> toto);
 	void PrintFactTab();
@@ -26,6 +30,6 @@ private:
 
 public:
 	void PrintGraph();
-	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *>);
+	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *> *, std::vector<std::string> *);
 	~Parser(void) {};
 };

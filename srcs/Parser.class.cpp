@@ -1,6 +1,6 @@
 #include "Parser.class.hpp"
 
-Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> link) 
+Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> * link, std::vector<std::string> * tabQuery) 
 			: CVectorToken(CVector), FactTab(link)
 {
 	for (size_t i = 0; i < CVectorToken->size(); i++)
@@ -9,12 +9,75 @@ Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *
 		{
 			Operator* tmp = reinterpret_cast<Operator *>((*(*CVectorToken)[i])[0]);
 			if (tmp->iGetID() == TOKEN_QUERY || tmp->iGetID() == TOKEN_FACT)
+			{
+				if (tmp->iGetID() == TOKEN_FACT)
+				{
+					ParseNodeValue(CVectorToken->at(i));
+				}
+				else
+				{
+					ParseQuery(CVectorToken->at(i), tabQuery);
+				}
 				continue ;
+			}
 		}
 		splitLineToken((*CVectorToken)[i]);
 	}
-	PrintGraph();
+	SetNodeValue();
+
 }
+
+void Parser::ParseQuery(std::vector<Token *> *tokenTab, std::vector<std::string> * tabQuery)
+{
+	for (size_t i = 1; i < tokenTab->size(); i++)
+	{
+		if (tokenTab->at(i)->bGetIsOperator())
+		{
+			std::cerr << "Error : Why do you have an operator in the query? PLS BITCH" << std::endl;
+			exit(0);
+		}
+		tabQuery->push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
+	}
+}
+
+void Parser::ParseNodeValue(std::vector<Token *> *tokenTab)
+{
+	for (size_t i = 1; i < tokenTab->size(); i++)
+	{
+		if (tokenTab->at(i)->bGetIsOperator())
+		{
+			std::cerr << "Error : Why do you have an operator in the fact? PLS" << std::endl;
+			exit(0);
+		}
+		nodeValueTab.push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
+	}
+}
+
+void Parser::SetNodeValue()
+{
+	bool bExist = false;
+
+	for (size_t i = 0; i < nodeValueTab.size(); i++)
+	{
+		bExist = false;
+		for (size_t j = 0; j < FactTab->size(); j++)
+		{
+			if (nodeValueTab[i] == FactTab->at(j)->szGetName())
+			{
+				bExist = true;
+				FactTab->at(j)->SetState(STATE_TRUE);
+				FactTab->at(j)->SetIsSet(true);
+			}
+		}
+		if (!bExist)
+		{
+			FactTab->push_back(new Fact(nodeValueTab[i]));
+			FactTab->back()->SetState(STATE_TRUE);
+			FactTab->back()->SetIsSet(true);
+		}
+	}
+}
+
 
 void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 {
@@ -197,13 +260,13 @@ Fact * Parser::getFact(Token *token)
 	if (!token->bGetIsMixed())
 	{
 		std::string szTmp = dynamic_cast<TokenFact *>(token)->szGetName();
-		for (size_t i = 0; i < FactTab.size(); i++)
+		for (size_t i = 0; i < FactTab->size(); i++)
 		{
-			if (szTmp == FactTab[i]->szGetName())
-				return FactTab[i];
+			if (szTmp == FactTab->at(i)->szGetName())
+				return FactTab->at(i);
 		}
 		Fact * tmpFact = new Fact(szTmp);
-		FactTab.push_back(tmpFact);
+		FactTab->push_back(tmpFact);
 		return tmpFact;
 	}
 	else
@@ -214,20 +277,20 @@ Fact * Parser::getFact(Token *token)
 
 void Parser::PrintGraph()
 {
-	for (size_t i = 0; FactTab.size() > i; i++)
+	for (size_t i = 0; FactTab->size() > i; i++)
 	{
-		std::cout << "Maillion N° "<< FactTab[i]->szGetName() << std::endl;
-		for (size_t j = 0; j < FactTab[i]->tabLink.size(); j++)
-		{
-			std::cout << "1st Link = " << FactTab[i]->tabLink[j]->getFirstLink()->szGetName() << std::endl;
-			if (FactTab[i]->tabLink[j]->getSecLink())
-				std::cout << "2nd Link = " << FactTab[i]->tabLink[j]->getSecLink()->szGetName() << std::endl;
-			std::cout << "Next = " << FactTab[i]->tabLink[j]->getNext()->szGetName() << std::endl;
-			std::cout << "Operator = " << FactTab[i]->tabLink[j]->iGetOperator() << std::endl;
-			std::cout << "Way = " << FactTab[i]->tabLink[j]->iGetWay() << std::endl;
-			PrintNode(FactTab[i]->tabLink[j]->getNext(), FactTab[i]->tabLink[j]);
-			std::cout << "____________________++++++++++_________________________________" << std::endl;
-		}
+		std::cout << "Maillion N° "<< FactTab->at(i)->szGetName() << " et " << FactTab->at(i)->iGetSate() << std::endl;
+		// for (size_t j = 0; j < FactTab->at(i)->tabLink.size(); j++)
+		// {
+		// 	std::cout << "1st Link = " << FactTab->at(i)->tabLink[j]->getFirstLink()->szGetName() << std::endl;
+		// 	if (FactTab->at(i)->tabLink[j]->getSecLink())
+		// 		std::cout << "2nd Link = " << FactTab->at(i)->tabLink[j]->getSecLink()->szGetName() << std::endl;
+		// 	std::cout << "Next = " << FactTab->at(i)->tabLink[j]->getNext()->szGetName() << std::endl;
+		// 	std::cout << "Operator = " << FactTab->at(i)->tabLink[j]->iGetOperator() << std::endl;
+		// 	std::cout << "Way = " << FactTab->at(i)->tabLink[j]->iGetWay() << std::endl;
+		// 	PrintNode(FactTab->at(i)->tabLink[j]->getNext(), FactTab->at(i)->tabLink[j]);
+		// 	std::cout << "____________________++++++++++_________________________________" << std::endl;
+		// }
 	}
 }
 
@@ -256,9 +319,9 @@ void Parser::PrintNode(Fact * fact, Instr * instr)
 
 void Parser::PrintFactTab()
 {
-	for (size_t i = 0; FactTab.size() > i; i++)
+	for (size_t i = 0; FactTab->size() > i; i++)
 	{
-		std::cout << FactTab[i]->szGetName() << std::endl;
+		std::cout << FactTab->at(i)->szGetName() << std::endl;
 	}
 }
 

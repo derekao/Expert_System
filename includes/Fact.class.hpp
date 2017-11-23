@@ -16,11 +16,17 @@
 #include <vector>
 #include "Instr.class.hpp"
 
+#define STATE_FALSE 0
+#define STATE_TRUE 1
+#define STATE_UNKNOWN 2
+
 class Fact
 {
 
 private:
 	std::string const szName;
+	int	iState;
+	bool bIsSet;
 
 public:
 	Fact(std::string & name);
@@ -30,4 +36,9 @@ public:
 	std::vector<Instr *> tabLink;
 
 	std::string szGetName() { return szName; };
+	int iGetSate() { return iState; };
+	bool bGetIsSet() { return bIsSet; };
+
+	void SetState(int state) { iState = state; };
+	void SetIsSet(bool set) { bIsSet = set; };
 };

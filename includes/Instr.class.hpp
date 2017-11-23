@@ -4,6 +4,11 @@
 #define WAY_DOWN 1
 #define WAY_UP 2
 
+template <typename T>
+T XOR(const T & a, const T & b)
+{
+	return ((a || b) && !(a && b));
+}
 
 class Fact;
 

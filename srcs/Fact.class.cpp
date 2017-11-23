@@ -12,12 +12,12 @@
 
 #include "Fact.class.hpp"
 
-Fact::Fact(std::string & name) : szName(name)
+Fact::Fact(std::string & name) : szName(name), iState(STATE_FALSE), bIsSet(false)
 {
 	
 }
 
-Fact::Fact() : szName("")
+Fact::Fact() : szName(""), iState(STATE_FALSE), bIsSet(false)
 {
 	
 }
