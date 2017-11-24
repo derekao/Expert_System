@@ -279,18 +279,18 @@ void Parser::PrintGraph()
 {
 	for (size_t i = 0; FactTab->size() > i; i++)
 	{
-		std::cout << "Maillion N° "<< FactTab->at(i)->szGetName() << " et " << FactTab->at(i)->iGetSate() << std::endl;
-		// for (size_t j = 0; j < FactTab->at(i)->tabLink.size(); j++)
-		// {
-		// 	std::cout << "1st Link = " << FactTab->at(i)->tabLink[j]->getFirstLink()->szGetName() << std::endl;
-		// 	if (FactTab->at(i)->tabLink[j]->getSecLink())
-		// 		std::cout << "2nd Link = " << FactTab->at(i)->tabLink[j]->getSecLink()->szGetName() << std::endl;
-		// 	std::cout << "Next = " << FactTab->at(i)->tabLink[j]->getNext()->szGetName() << std::endl;
-		// 	std::cout << "Operator = " << FactTab->at(i)->tabLink[j]->iGetOperator() << std::endl;
-		// 	std::cout << "Way = " << FactTab->at(i)->tabLink[j]->iGetWay() << std::endl;
-		// 	PrintNode(FactTab->at(i)->tabLink[j]->getNext(), FactTab->at(i)->tabLink[j]);
-		// 	std::cout << "____________________++++++++++_________________________________" << std::endl;
-		// }
+		std::cout << "Maillion N° "<< FactTab->at(i)->szGetName() << " et " << FactTab->at(i)->iGetState() << std::endl;
+		for (size_t j = 0; j < FactTab->at(i)->tabLink.size(); j++)
+		{
+			std::cout << "1st Link = " << FactTab->at(i)->tabLink[j]->getFirstLink()->szGetName() << std::endl;
+			if (FactTab->at(i)->tabLink[j]->getSecLink())
+				std::cout << "2nd Link = " << FactTab->at(i)->tabLink[j]->getSecLink()->szGetName() << std::endl;
+			std::cout << "Next = " << FactTab->at(i)->tabLink[j]->getNext()->szGetName() << std::endl;
+			std::cout << "Operator = " << FactTab->at(i)->tabLink[j]->iGetOperator() << std::endl;
+			std::cout << "Way = " << FactTab->at(i)->tabLink[j]->iGetWay() << std::endl;
+			PrintNode(FactTab->at(i)->tabLink[j]->getNext(), FactTab->at(i)->tabLink[j]);
+			std::cout << "____________________++++++++++_________________________________" << std::endl;
+		}
 	}
 }
 

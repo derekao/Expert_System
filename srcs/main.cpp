@@ -12,6 +12,7 @@
 
 #include "Lexer.class.hpp"
 #include "Parser.class.hpp"
+#include "ExpertSystem.class.hpp"
 
 int main(int ac, char **av)
 {

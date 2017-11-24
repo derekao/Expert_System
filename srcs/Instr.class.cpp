@@ -1,7 +1,7 @@
 #include "Instr.class.hpp"
 
 Instr::Instr(Fact *fL, Fact *sL, Fact *nxt, int Op, int way) :
-			firstLink(fL), SecLink(sL), next(nxt), iOperator(Op), iWay(way)
+			firstLink(fL), SecLink(sL), next(nxt), iOperator(Op), iWay(way), iIteration(0)
 {
 
 }

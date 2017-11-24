@@ -40,6 +40,7 @@ Lexer::Lexer(std::string szFileName, std::vector< std::vector<Token *> *> * CVec
 			{
 				std::cerr << VectorError[i] << std::endl;
 			}
+			exit(0);
 		}
 	}
 

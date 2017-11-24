@@ -21,3 +21,14 @@ Fact::Fact() : szName(""), iState(STATE_FALSE), bIsSet(false)
 {
 	
 }
+
+void Fact::SetState(int state) 
+{
+	if (!bIsSet || iState == state)
+		iState = state;
+	else
+	{
+		std::cerr <<  "Incoherence in the rules" << std::endl;
+		exit(0);
+	}
+}

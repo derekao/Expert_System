@@ -24,6 +24,8 @@ private:
 	bool bNegTwo;
 	bool bNegNext;
 
+	int iIteration;
+
 	Instr(void);
 
 public:
@@ -38,6 +40,9 @@ public:
 
 	int iGetOperator() { return iOperator; } ;
 	int iGetWay() { return iWay; } ;
+	int iGetNbIteration() { return iIteration; };
+
+	void IncreaseInteration() { iIteration++; };
 
 	bool bGetNegOne() { return bNegOne; } ;
 	bool bGetNegTwo() { return bNegTwo; } ;

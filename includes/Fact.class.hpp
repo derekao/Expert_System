@@ -36,9 +36,9 @@ public:
 	std::vector<Instr *> tabLink;
 
 	std::string szGetName() { return szName; };
-	int iGetSate() { return iState; };
+	int iGetState() { return iState; };
 	bool bGetIsSet() { return bIsSet; };
 
-	void SetState(int state) { iState = state; };
+	void SetState(int state);
 	void SetIsSet(bool set) { bIsSet = set; };
 };
