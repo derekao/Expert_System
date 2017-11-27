@@ -24,11 +24,12 @@ Fact::Fact() : szName(""), iState(STATE_FALSE), bIsSet(false)
 
 void Fact::SetState(int state) 
 {
+//	std::cout << "TEST = " << state << " et " << iState <<  " et " << szName << std::endl;
 	if (!bIsSet || iState == state)
 		iState = state;
 	else
 	{
-		std::cerr <<  "Incoherence in the rules" << std::endl;
+		std::cerr <<  "Incoherence in the rules : Fact" << state <<  " et " << bIsSet << std::endl;
 		exit(0);
 	}
 }

@@ -86,6 +86,9 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	Operator *middleToken = NULL;
 	bool lineMiddle = false;
 
+	bool bFirstFact = false;
+	bool bNextFact = false;
+
 	for (size_t i = 0; i < tokenLine->size(); i++)
 	{
 		if ((*tokenLine)[i]->bGetIsOperator())
@@ -95,7 +98,17 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 				lineMiddle = true;
 		}
 		if (lineMiddle && !middleToken)
+		{
 			middleToken = dynamic_cast<Operator *>(tokenLine->at(i));
+			if (i == 1 && tokenLine->at(0)->bGetNeg())
+			{	
+				bFirstFact = true;
+			}
+			if (i == tokenLine->size() - 2 && tokenLine->at(i + 1)->bGetNeg())
+			{
+				bNextFact = true;
+			}
+		}
 		else if(!lineMiddle)
 			input1->push_back((*tokenLine)[i]);
 		else
@@ -108,7 +121,7 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	}
 	input1 = ShuntingYardAlgo(input1);	
 	input2 = ShuntingYardAlgo(input2);
-	buildGraph(input1, input2, middleToken);
+	buildGraph(input1, input2, middleToken, bFirstFact, bNextFact);
 
 }
 
@@ -189,7 +202,7 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 
 }
 
-void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken)
+void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken, bool bFirstFact, bool bNextFact)
 {
 	Fact * wayIn;
 	Fact * wayOut;
@@ -200,16 +213,17 @@ void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *inpu
 		wayIn = buildNode(input1, WAY_EQUAL);
 		wayOut = buildNode(input2, WAY_EQUAL);
 		instr = new Instr(wayIn, NULL, wayOut, TOKEN_EQUAL, WAY_EQUAL);
+		instr->SetNeg(bFirstFact, 0, bNextFact);
 	}
 	else
 	{
 		wayIn = buildNode(input1, WAY_DOWN);
 		wayOut = buildNode(input2, WAY_UP);
 		instr = new Instr(wayIn, NULL, wayOut, TOKEN_IMPLY, WAY_DOWN);
+		instr->SetNeg(bFirstFact, 0, bNextFact);
 	}
 	wayIn->tabLink.push_back(instr);
 	wayOut->tabLink.push_back(instr);
-//	CheckRuleRight(); TODO
 }
 
 Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)

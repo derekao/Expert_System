@@ -17,7 +17,7 @@ private:
 	Parser(void);
 	void	splitLineToken(std::vector<Token *> *tokenLine);
 	std::vector<Token *> *ShuntingYardAlgo(std::vector<Token *> *Input);
-	void buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken);
+	void buildGraph(std::vector<Token *> *input1, std::vector<Token *> *input2, Operator *middleToken, bool bFirstFact, bool bNextFact);
 	Fact * buildNode(std::vector<Token *> *input1, int way);
 	Fact * getFact(Token * token);
 	void ParseNodeValue(std::vector<Token *> *tokenTab);
