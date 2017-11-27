@@ -182,6 +182,58 @@ void ExpertSystem::PrintVerbose(std::string instr, std::string fact1, std::strin
 			<< (bNegNext ? "!" : "") << szName3 << "\033[m = \033[31m" << szValueNext << "\033[m" << std::endl;
 }
 
+void ExpertSystem::PrintVerboseUp(std::string instr, std::string fact1, std::string fact2, std::string next, bool bNeg1, bool bNeg2, bool bNegNext, int iStateNext, int iStateTwo, int iStateOne)
+{
+	std::string szValueNext;
+	std::string szValueTwo;
+	std::string szValueOne;
+	std::string szName1;
+	std::string szName2;
+	std::string szName3;
+
+	if (iStateNext == STATE_TRUE)
+		szValueNext = "True";
+	else if (iStateNext == STATE_FALSE)
+		szValueNext = "False";
+	else
+		szValueNext = "Unknown";
+
+	if (iStateTwo == STATE_TRUE)
+		szValueTwo = "True";
+	else if (iStateTwo == STATE_FALSE)
+		szValueTwo = "False";
+	else
+		szValueTwo = "Unknown";
+
+	if (iStateOne == STATE_TRUE)
+		szValueOne = "True";
+	else if (iStateOne == STATE_FALSE)
+		szValueOne = "False";
+	else
+		szValueOne = "Unknown";
+
+	if (!fact1.compare(""))
+		szName1 = "Token Mixed";
+	else
+		szName1 = fact1;
+
+	if (!fact2.compare(""))
+		szName2 = "Token Mixed";
+	else
+		szName2 = fact2;
+
+	if (!next.compare(""))
+		szName3 = "Token Mixed";
+	else
+		szName3 = next;
+
+	std::cout << "Instruction \033[33m" << instr << "\033[m on \033[32m" << (bNeg1 ? "!" : "") << szName1
+			<< "\033[m and \033[32m" << (bNeg2 ? "!" : "") << szName2 << "\033[m " << "we know that \033[32m"
+			<< (bNegNext ? "!" : "") << szName3 << "\033[m = \033[31m" << szValueNext << "\033[m"
+			<< " and \033[32m" << (bNeg2 ? "!" : "") << szName2 << "\033[m = \033[31m" << szValueTwo << "\033[m"
+			<< " so \033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m is \033[31m" << szValueOne << "\033[m" << std::endl;
+}
+
 void ExpertSystem::wayDownAND(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
@@ -496,6 +548,8 @@ void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
 			}	
 		}
 	}
+	if (bVerbose)
+		PrintVerboseUp("AND", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(fstFact->iGetState(), bNegFst), getStateValue(sndFact->iGetState(), bNegSnd), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 
 }
 
@@ -596,6 +650,8 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 			}
 		}
 	}
+	if (bVerbose)
+		PrintVerboseUp("OR", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(fstFact->iGetState(), bNegFst), getStateValue(sndFact->iGetState(), bNegSnd), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }
 
 void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)
