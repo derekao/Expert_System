@@ -549,7 +549,7 @@ void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
 		}
 	}
 	if (bVerbose)
-		PrintVerboseUp("AND", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(fstFact->iGetState(), bNegFst), getStateValue(sndFact->iGetState(), bNegSnd), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
+		PrintVerboseUp("AND", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(nextFact->iGetState(), instr->bGetNegNext()), getStateValue(sndFact->iGetState(), bNegSnd),getStateValue(fstFact->iGetState(), bNegFst));
 
 }
 
@@ -651,7 +651,7 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 		}
 	}
 	if (bVerbose)
-		PrintVerboseUp("OR", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(fstFact->iGetState(), bNegFst), getStateValue(sndFact->iGetState(), bNegSnd), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
+		PrintVerboseUp("OR", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(nextFact->iGetState(), instr->bGetNegNext()), getStateValue(sndFact->iGetState(), bNegSnd),getStateValue(fstFact->iGetState(), bNegFst));
 }
 
 void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)

@@ -73,6 +73,31 @@ void Lexer::CheckLineFormat(std::string & szLine, int iLine)
 	}
 }
 
+void Lexer::deleteVector(std::vector<Token *> *vector)
+{
+	for (size_t i = 0; i < vector->size(); i++)
+	{
+		if (vector->at(i)->bGetIsMixed())
+		{
+			delete dynamic_cast<TokenMixed *>(vector->at(i));
+		}
+		else if (vector->at(i)->bGetIsOperator())
+		{
+			delete dynamic_cast<Operator *>(vector->at(i));
+		}
+		else if (!vector->at(i)->bGetIsOperator())
+		{
+			delete dynamic_cast<TokenFact *>(vector->at(i));
+		}
+		else
+		{
+			std::cerr << "ERROR : UNSET TOKEN" << std::endl;
+			exit (0);
+		}
+	}
+	delete vector;
+}
+
 void Lexer::LexLine(std::string szLine, int iLine)
 {
 	std::vector<Token *> *tmpVector = new std::vector<Token *>;
@@ -97,6 +122,7 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			bError = true;
 			VectorError.push_back("Negation error : " + szLine.substr(i, 1)
 					+ " at line : " + std::to_string(iLine));
+			Lexer::deleteVector(tmpVector);
 			return ;
 		}
 		else if (szLine[i] == '(')
@@ -134,8 +160,12 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			bError = true;
 			VectorError.push_back("Unknown char : " + szLine.substr(i, 1)
 					+ " at line : " + std::to_string(iLine));
+			Lexer::deleteVector(tmpVector);
 			return ;
 		}
 	}
-	CVectorToken->push_back(tmpVector);
+	if (tmpVector->size() == 0)
+		delete tmpVector;
+	else
+		CVectorToken->push_back(tmpVector);
 }

@@ -19,6 +19,7 @@
 # include <vector>
 # include "TokenFact.class.hpp"
 # include "Operator.class.hpp"
+# include "TokenMixed.class.hpp"
 
 class Lexer
 {
@@ -38,5 +39,6 @@ public:
 	Lexer(std::string szFileName, std::vector< std::vector<Token *> *> *CVector);
 	~Lexer(void);
 
+	static void deleteVector(std::vector<Token *> *vector);
 };
 
