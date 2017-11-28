@@ -1,3 +1,4 @@
-B + A => !(!B + C)
-?CB
-=AB
+R => D | B
+A + B + C + D + E + Z | Y => W
+?WA
+=ABR

@@ -37,7 +37,7 @@ private:
 	void backWardChaining(Fact *);
 
 public:
-	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *);
+	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, bool);
 	~ExpertSystem() {} ;
 
 };

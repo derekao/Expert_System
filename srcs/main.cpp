@@ -16,15 +16,34 @@
 
 int main(int ac, char **av)
 {
-	if (ac == 2)
+	if (ac >= 2)
 	{
-		std::vector< std::vector<Token *> *> CVectorToken;
-		std::vector<Fact *> TabFact;
-		std::vector<std::string> TabQuery;
+		std::vector<std::string> vecArgv;
 
-		Lexer(std::string(av[1]), &CVectorToken);
-		Parser(&CVectorToken, &TabFact, &TabQuery);
-		ExpertSystem(&TabFact, &TabQuery);
+		bool	bVerbose = false;
+		
+		for (size_t i = 0; i < static_cast<size_t>(ac) - 1; i++)
+		{
+			vecArgv.push_back(std::string(av[i + 1]));
+			if (vecArgv[i].compare("-v") == 0)
+			{
+				bVerbose = true;
+				vecArgv.pop_back();
+			}
+
+		}
+	
+		for (size_t i = 0; i < vecArgv.size(); i++)
+		{		
+			std::vector< std::vector<Token *> *> CVectorToken;
+			std::vector<Fact *> TabFact;
+			std::vector<std::string> TabQuery;
+
+			Lexer(vecArgv[i], &CVectorToken);
+			Parser(&CVectorToken, &TabFact, &TabQuery);
+			ExpertSystem(&TabFact, &TabQuery, bVerbose);
+			std::cout << "\033[35m----------------------------------------------------------------------------------------------\033[m" << std::endl;
+		}
 	
 	}
 	return 0;

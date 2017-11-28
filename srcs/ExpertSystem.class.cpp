@@ -1,6 +1,6 @@
 #include "ExpertSystem.class.hpp"
 
-ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery) : tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(true)
+ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, bool verbose) : tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(verbose)
 {
     bool bInTabFact = false;
 
@@ -14,9 +14,9 @@ ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::stri
                 bInTabFact = true;
 				backWardChaining(tabFact->at(j));
 				if (tabFact->at(j)->iGetState() == STATE_FALSE)
-					std::cout << tabQuery->at(i) << " = False " << tabFact->at(j)->bGetIsSet() << std::endl;
+					std::cout << tabQuery->at(i) << " = False " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
 				else if (tabFact->at(j)->iGetState() == STATE_TRUE)
-					std::cout << tabQuery->at(i) << " = True " << tabFact->at(j)->bGetIsSet() << std::endl;
+					std::cout << tabQuery->at(i) << " = True " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
 				else if (tabFact->at(j)->iGetState() == STATE_UNKNOWN)
 					std::cout << tabQuery->at(i) << " = Unknown" << std::endl;
 				else
@@ -762,6 +762,8 @@ void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)
 			fstFact->SetState(STATE_UNKNOWN);
 		}
 	}
+	if (bVerbose)
+		PrintVerboseUp("XOR", fstFact->szGetName(), sndFact->szGetName(), nextFact->szGetName(), bNegFst, bNegSnd, instr->bGetNegNext(),getStateValue(nextFact->iGetState(), instr->bGetNegNext()), getStateValue(sndFact->iGetState(), bNegSnd),getStateValue(fstFact->iGetState(), bNegFst));
 }
 
 void ExpertSystem::wayUpIMPLY(Instr * instr)

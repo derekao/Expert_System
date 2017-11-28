@@ -24,7 +24,7 @@ Fact::Fact() : szName(""), iState(STATE_FALSE), bIsSet(false)
 
 void Fact::SetState(int state) 
 {
-//	std::cout << "TEST = " << state << " et " << iState <<  " et " << szName << std::endl;
+	std::cout << "TEST = " << state << " et " << iState <<  " et " << szName << std::endl;
 	if (!bIsSet || iState == state)
 		iState = state;
 	else
