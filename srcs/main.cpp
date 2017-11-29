@@ -15,6 +15,14 @@
 #include "ExpertSystem.class.hpp"
 #include "Fact.class.hpp"
 
+static void helper()
+{
+	std::cout << std::endl << "Usage: ./Expert_System [ file.txt ] [ -v | -d | -u ]" << std::endl << std::endl;
+	std::cout << "	-v	Describe the comportement of the program." << std::endl;
+	std::cout << "	-d	Show the result of all facts and look for any incoherences." << std::endl;
+	std::cout << "	-u	Let you set as true or false any facts when they are unknown." << std::endl << std::endl;
+}
+
 int main(int ac, char **av)
 {
 	if (ac >= 2)
@@ -35,7 +43,6 @@ int main(int ac, char **av)
 			}
 			else if (vecArgv.back().compare("-d") == 0)
 			{
-				std::cout << "DEBUG MODE : ON" << std::endl;
 				bDebug = true;
 				vecArgv.pop_back();
 			}
@@ -46,7 +53,7 @@ int main(int ac, char **av)
 			}
 		}
 		for (size_t i = 0; i < vecArgv.size(); i++)
-		{		
+		{
 			std::vector< std::vector<Token *> *> CVectorToken;
 			std::vector<Fact *> TabFact;
 			std::vector<std::string> TabQuery;
@@ -57,6 +64,9 @@ int main(int ac, char **av)
 			ExpertSystem(&TabFact, &TabQuery, bVerbose, bUnknown, bDebug);
 			return 0;
 		}
+		helper();
 	}
+	else
+		helper();
 	return 0;
 }

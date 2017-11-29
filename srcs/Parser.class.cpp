@@ -35,7 +35,7 @@ void Parser::ParseQuery(std::vector<Token *> *tokenTab, std::vector<std::string>
 		{
 			if (tokenTab->at(i)->bGetIsOperator())
 			{
-				std::cerr << "Error : Why do you have an operator in the query? PLS BITCH" << std::endl;
+				std::cerr << "Error : Why do you have an operator in the query ?" << std::endl;
 				exit(0);
 			}
 			tabQuery->push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
@@ -56,7 +56,7 @@ void Parser::ParseNodeValue(std::vector<Token *> *tokenTab)
 	{
 		if (tokenTab->at(i)->bGetIsOperator())
 		{
-			std::cerr << "Error : Why do you have an operator in the fact? PLS" << std::endl;
+			std::cerr << "Error : Why do you have an operator in the fact ?" << std::endl;
 			exit(0);
 		}
 		nodeValueTab.push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
@@ -126,7 +126,7 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	}
 	if (!input1->size() || !input2->size())
 	{
-		std::cerr << "Error : Wrong rule" << std::endl;
+		std::cerr << "Error : Wrong rule." << std::endl;
 		exit(0);
 	}
 	input1 = ShuntingYardAlgo(input1);	
@@ -180,7 +180,7 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 			}
 			if (!Stack.size())
 			{
-				std::cerr << "There are mismatched closed parentheses" << std::endl;
+				std::cerr << "There are mismatched closed parentheses." << std::endl;
 				exit(0);
 			}
 			else
@@ -202,7 +202,7 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 	{
 		if ((dynamic_cast<Operator *>(Stack.back()))->iGetID() == TOKEN_OPEN)
 		{
-			std::cerr << "There are mismatched opened parentheses" << std::endl;
+			std::cerr << "There are mismatched opened parentheses." << std::endl;
 			exit(0);
 		}	
 		Output->push_back(Stack.back());

@@ -1,4 +1,11 @@
-A => B | C
+A => B ^ C
 B => D
 ?D
 =A
+
+On a un probleme quand on lance les trois flags en meme temps
+
+#    \033[m    END
+#    \033[33m  JAUNE
+#    \033[31m  RED
+#    \033[32m  GREEN

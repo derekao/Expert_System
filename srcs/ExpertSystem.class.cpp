@@ -1,50 +1,53 @@
 #include "ExpertSystem.class.hpp"
 
+bool ExpertSystem::bRestart = false;
+
 ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, bool verbose, bool unknown, bool debug) :
 			tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(verbose), bUnknown(unknown), bDebug(debug)
 {
-    bool bInTabFact = false;
-	bool bStopLoop = false;
-
     for (size_t i = 0; i < tabQuery->size(); i++)
     {
-        bInTabFact = false;
         for (size_t j = 0; j < tabFact->size(); j++)
         {
             if (tabFact->at(j)->szGetName() == tabQuery->at(i))
             {
-                bInTabFact = true;
 				backWardChaining(tabFact->at(j), NULL);
-				if ((bDebug && bStopLoop) || !bDebug)
-				{
-					if (tabFact->at(j)->iGetState() == STATE_FALSE)
-						std::cout << tabQuery->at(i) << " = False " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
-					else if (tabFact->at(j)->iGetState() == STATE_TRUE)
-						std::cout << tabQuery->at(i) << " = True " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
-					else if (tabFact->at(j)->iGetState() == STATE_UNKNOWN)
-						std::cout << tabQuery->at(i) << " = Unknown" << std::endl;
-					else
-					{
-						std::cerr << "WTF IS GOING ON ON LINE 23 ON EXPERT SYSTEM" << std::endl;
-						exit (0);
-					}
-               		break ;
-				}
+				if (ExpertSystem::bRestart)
+		        {
+		        	i = -1;
+		        	ExpertSystem::bRestart = false;
+		        }
+           		break ;
             }
         }
-        if (!bInTabFact)
-        {
-            std::cout << tabQuery->at(i) << " = False unset" << std::endl;
-        }
-		if (bDebug && !bStopLoop)
-		{
-			if (i == tabQuery->size() - 1)
-			{
-				i = -1;
-				bStopLoop = true;
-			}
-		}
     }
+    displayResult();
+}
+
+void ExpertSystem::displayResult()
+{
+	bool bInTabFact = false;
+
+	for (size_t i = 0; i < tabQuery->size(); i++)
+    {
+    	bInTabFact = false;
+    	for (size_t j = 0; j < tabFact->size(); j++)
+        {
+        	if (tabFact->at(j)->szGetName() == tabQuery->at(i))
+            {
+	        	bInTabFact = true;
+	        	if (tabFact->at(j)->iGetState() == STATE_FALSE)
+					std::cout << "\033[32m" << tabQuery->at(i) << "\033[m = \033[31mFalse\033[m " << (tabFact->at(j)->bGetIsSet() ? "\033[35mSet" : "\033[36mUnset") << "\033[m" << std::endl;
+				else if (tabFact->at(j)->iGetState() == STATE_TRUE)
+					std::cout << "\033[32m" << tabQuery->at(i) << "\033[m = \033[31mTrue\033[m " << (tabFact->at(j)->bGetIsSet() ? "\033[35mSet" : "\033[36mUnset") << "\033[m" << std::endl;
+				else if (tabFact->at(j)->iGetState() == STATE_UNKNOWN)
+					std::cout << "\033[32m" << tabQuery->at(i) << "\033[m = \033[31mUnknown\033[m" << std::endl;
+				break ;
+			}
+        }
+		if (!bInTabFact)
+			std::cout << tabQuery->at(i) << " = False Unset" << std::endl;
+	}
 }
 
 void ExpertSystem::backWardChaining(Fact * queryFact, Instr * pastInstr)
@@ -314,15 +317,15 @@ void ExpertSystem::PrintImply(std::string fact1, std::string next, bool bNeg1, b
 
 	if (iStateOne == STATE_TRUE)
 	{
-		std::cout << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " IMPLY that " << (bNegNext ? "!" : "") << szName3 << " is " << szValueNext << std::endl;
+		std::cout << "\033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m is \033[31m" << szValueOne << "\033[m \033[33mIMPLY\033[m that \033[32m" << (bNegNext ? "!" : "") << szName3 << "\033[m is \033[31m" << szValueNext << "\033[m" << std::endl;
 	}
 	else if (iStateNext == STATE_FALSE)
 	{
-		std::cout << (bNegNext ? "!" : "") << szName3 <<  " is " << szValueNext << " IMPLY that " << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " (contrapositive) " << std::endl;
+		std::cout << "\033[32m" << (bNegNext ? "!" : "") << szName3 <<  "\033[m is \033[31m" << szValueNext << "\033[m \033[33mIMPLY\033[m that \033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m is \033[31m" << szValueOne << "\033[m (contrapositive) " << std::endl;
 	}
 	else
 	{
-		std::cout << "False on unknown fact doesn't IMPLY anything : " << (bNeg1 ? "!" : "") << szName1 << " IMPLY " << (bNegNext ? "!" : "") << szName3 << " with " << szValueOne << " and " << szValueNext << std::endl;
+		std::cout << "\033[31mFalse\033[m on \033[31munknown\033[m fact doesn't \033[33mIMPLY\033[m anything : \033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m \033[33mIMPLY\033[m \033[32m" << (bNegNext ? "!" : "") << szName3 << "\033[m with \033[32m" << szValueOne << "\033[m and \033[31m" << szValueNext << "\033[m" << std::endl;
 	}
 }
 
@@ -357,7 +360,7 @@ void ExpertSystem::PrintEQUAL(std::string fact1, std::string next, bool bNeg1, b
 	else
 		szName3 = next;
 
-	std::cout << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " EQUIVALENT that " << (bNegNext ? "!" : "") << szName3 << " is " << szValueNext << std::endl;
+	std::cout << "\033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m is \033[31m" << szValueOne << "\033[m \033[33mEQUIVALENT\033[m that \033[32m" << (bNegNext ? "!" : "") << szName3 << "\033[m is \033[31m" << szValueNext << "\033[m" << std::endl;
 }
 
 void ExpertSystem::wayDownAND(Instr * instr)
@@ -510,7 +513,7 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 		{
 			if (nextFact->bGetIsSet() && valueFirst != valueNext)
 			{
-				std::cerr <<  "Incoherence in the rules : WRONG IMPLY" << std::endl;
+				std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG IMPLY" << std::endl;
 				exit(0);
 			}
 			SetState(STATE_TRUE, instr->bGetNegNext(), nextFact);
@@ -523,7 +526,7 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 	{
 		if (fstFact->bGetIsSet() && valueFirst != valueNext)
 		{
-			std::cerr <<  "Incoherence in the rules : WRONG IMPLY (contrapositive)" << std::endl;
+			std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG IMPLY (contrapositive)" << std::endl;
 			exit(0);
 		}
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
@@ -556,7 +559,7 @@ void ExpertSystem::wayDownEQUAL(Instr * instr)
 	
 	if (fstFact->bGetIsSet() && nextFact->bGetIsSet() && valueFirst != valueNext)
 	{
-		std::cerr <<  "Incoherence in the rules : WRONG EQUIVALANCE " << std::endl;
+		std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG EQUIVALANCE " << std::endl;
 		exit(0);
 	}
 	else if (fstFact->bGetIsSet() && !nextFact->bGetIsSet())
@@ -626,7 +629,7 @@ void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
 		{
 			if (sndFact->bGetIsSet() && valueSecond == STATE_FALSE)
 			{
-				std::cerr <<  "Incoherence in the rules : WRONG AND" << std::endl;
+				std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG AND" << std::endl;
 				exit(0);
 			}
 			else if (!sndFact->bGetIsSet())
@@ -715,7 +718,7 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 		{
 			if (sndFact->bGetIsSet() && valueSecond == STATE_TRUE)
 			{
-				std::cerr <<  "Incoherence in the rules : WRONG OR" << std::endl;
+				std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG OR" << std::endl;
 				exit(0);
 			}
 			else if (sndFact->bGetIsSet() && valueSecond == STATE_FALSE)
@@ -911,7 +914,7 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 		{
 			if (nextFact->bGetIsSet() && valueFirst != valueNext)
 			{
-				std::cerr <<  "Incoherence in the rules : WRONG IMPLY" << std::endl;
+				std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG IMPLY" << std::endl;
 				exit(0);
 			}
 			SetState(STATE_TRUE, instr->bGetNegNext(), nextFact);
@@ -924,7 +927,7 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 	{
 		if (fstFact->bGetIsSet() && valueFirst != valueNext)
 		{
-			std::cerr <<  "Incoherence in the rules : WRONG IMPLY (contrapositive)" << std::endl;
+			std::cerr <<  "\033[31mIncoherence in the rules :\033[m WRONG IMPLY (contrapositive)" << std::endl;
 			exit(0);
 		}
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);

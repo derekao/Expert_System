@@ -41,8 +41,11 @@ private:
 	void wayUpIMPLY(Instr * instr);
 	void backWardChaining(Fact *, Instr *);
 
+	void displayResult();
+
 public:
 	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, bool, bool, bool);
 	~ExpertSystem() {} ;
 
+	static bool bRestart;
 };
