@@ -40,5 +40,6 @@ public:
 	~Lexer(void);
 
 	static void deleteVector(std::vector<Token *> *vector);
+	static void deleteToken(Token * token);
 };
 

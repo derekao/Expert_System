@@ -1,7 +1,7 @@
 #include "Parser.class.hpp"
 
-Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> * link, std::vector<std::string> * tabQuery) 
-			: CVectorToken(CVector), FactTab(link)
+Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> * link, std::vector<std::string> * tabQuery, bool debug) 
+			: CVectorToken(CVector), FactTab(link), bDebug(debug)
 {
 	for (size_t i = 0; i < CVectorToken->size(); i++)
 	{
@@ -29,14 +29,24 @@ Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *
 
 void Parser::ParseQuery(std::vector<Token *> *tokenTab, std::vector<std::string> * tabQuery)
 {
-	for (size_t i = 1; i < tokenTab->size(); i++)
+	if (!bDebug)
 	{
-		if (tokenTab->at(i)->bGetIsOperator())
+		for (size_t i = 1; i < tokenTab->size(); i++)
 		{
-			std::cerr << "Error : Why do you have an operator in the query? PLS BITCH" << std::endl;
-			exit(0);
+			if (tokenTab->at(i)->bGetIsOperator())
+			{
+				std::cerr << "Error : Why do you have an operator in the query? PLS BITCH" << std::endl;
+				exit(0);
+			}
+			tabQuery->push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
 		}
-		tabQuery->push_back(dynamic_cast<TokenFact *>(tokenTab->at(i))->szGetName());
+	}
+	else
+	{
+		for (size_t i = 0; i < FactTab->size(); i++)
+		{
+			tabQuery->push_back(FactTab->at(i)->szGetName());
+		}
 	}
 }
 
@@ -122,7 +132,8 @@ void	Parser::splitLineToken(std::vector<Token *> *tokenLine)
 	input1 = ShuntingYardAlgo(input1);	
 	input2 = ShuntingYardAlgo(input2);
 	buildGraph(input1, input2, middleToken, bFirstFact, bNextFact);
-
+	Lexer::deleteVector(input1);
+	Lexer::deleteVector(input2);
 }
 
 std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
@@ -234,6 +245,7 @@ Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)
 
 	Token *token1;
 	Token *token2;
+	Token *token3;
 	Operator *op;
 	
 	Instr *instr;
@@ -258,11 +270,18 @@ Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)
 	concatToken = new TokenMixed(op->bGetNeg(), next);
 	token1 = input->at(i - 2);
 	token2 = input->at(i - 1);
+	token3 = input->at(i);
+
 	input->erase(input->begin() + i - 2, input->begin() + i + 1);
 	i -= 2;
 	input->insert(input->begin() + i, concatToken);
 	instr = new Instr(fact1, fact2, next, op->iGetID(), iWay);
 	instr->SetNeg(token1->bGetNeg(),token2->bGetNeg(),op->bGetNeg());
+
+	Lexer::deleteToken(token1);
+	Lexer::deleteToken(token2);
+	Lexer::deleteToken(token3);
+
 	fact1->tabLink.push_back(instr);
 	fact2->tabLink.push_back(instr);
 	next->tabLink.push_back(instr);

@@ -1,8 +1,10 @@
 #include "ExpertSystem.class.hpp"
 
-ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, bool verbose) : tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(verbose)
+ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, bool verbose, bool unknown, bool debug) :
+			tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(verbose), bUnknown(unknown), bDebug(debug)
 {
     bool bInTabFact = false;
+	bool bStopLoop = false;
 
     for (size_t i = 0; i < tabQuery->size(); i++)
     {
@@ -12,57 +14,55 @@ ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::stri
             if (tabFact->at(j)->szGetName() == tabQuery->at(i))
             {
                 bInTabFact = true;
-				backWardChaining(tabFact->at(j));
-				if (tabFact->at(j)->iGetState() == STATE_FALSE)
-					std::cout << tabQuery->at(i) << " = False " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
-				else if (tabFact->at(j)->iGetState() == STATE_TRUE)
-					std::cout << tabQuery->at(i) << " = True " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
-				else if (tabFact->at(j)->iGetState() == STATE_UNKNOWN)
-					std::cout << tabQuery->at(i) << " = Unknown" << std::endl;
-				else
+				backWardChaining(tabFact->at(j), NULL);
+				if ((bDebug && bStopLoop) || !bDebug)
 				{
-					std::cerr << "WTF IS GOING ON ON LINE 23 ON EXPERT SYSTEM" << std::endl;
-					exit (0);
+					if (tabFact->at(j)->iGetState() == STATE_FALSE)
+						std::cout << tabQuery->at(i) << " = False " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
+					else if (tabFact->at(j)->iGetState() == STATE_TRUE)
+						std::cout << tabQuery->at(i) << " = True " << (tabFact->at(j)->bGetIsSet() ? "set" : "unset") << std::endl;
+					else if (tabFact->at(j)->iGetState() == STATE_UNKNOWN)
+						std::cout << tabQuery->at(i) << " = Unknown" << std::endl;
+					else
+					{
+						std::cerr << "WTF IS GOING ON ON LINE 23 ON EXPERT SYSTEM" << std::endl;
+						exit (0);
+					}
+               		break ;
 				}
-                break ;
             }
         }
         if (!bInTabFact)
         {
-            std::cout << tabQuery->at(i) << " = False" << std::endl;
+            std::cout << tabQuery->at(i) << " = False unset" << std::endl;
         }
+		if (bDebug && !bStopLoop)
+		{
+			if (i == tabQuery->size() - 1)
+			{
+				i = -1;
+				bStopLoop = true;
+			}
+		}
     }
 }
 
-void ExpertSystem::backWardChaining(Fact * queryFact)
+void ExpertSystem::backWardChaining(Fact * queryFact, Instr * pastInstr)
 {
 	Instr *instr;
 	for (size_t i = 0; i < queryFact->tabLink.size(); i++)
 	{
 		instr = queryFact->tabLink[i];
+		if (pastInstr == instr)
+			continue ;
 		if (instr->iGetNbIteration() >= NB_ITERATION_INSTR)
 			continue ;
 		else
-			instr->IncreaseInteration();
-		if ((instr->iGetWay() == WAY_DOWN || instr->iGetWay() == WAY_EQUAL) && queryFact == instr->getNext())
+			instr->IncreaseInteration();		
+		if (queryFact == instr->getNext() && (instr->iGetOperator() == TOKEN_IMPLY || instr->iGetOperator() == TOKEN_EQUAL))
 		{
 			switch (instr->iGetOperator())
 			{
-				case TOKEN_AND :
-				{
-					wayDownAND(instr);
-					break;
-				}
-				case TOKEN_OR :
-				{
-					wayDownOR(instr);
-					break;
-				}
-				case TOKEN_XOR :
-				{
-					wayDownXOR(instr);
-					break;
-				}
 				case TOKEN_IMPLY :
 				{
 					wayDownIMPLY(instr);
@@ -75,25 +75,10 @@ void ExpertSystem::backWardChaining(Fact * queryFact)
 				}
 			}
 		}
-		else if ((instr->iGetWay() == WAY_UP || instr->iGetWay() == WAY_EQUAL) && queryFact != instr->getNext())
+		else if (queryFact != instr->getNext() && (instr->iGetOperator() == TOKEN_IMPLY || instr->iGetOperator() == TOKEN_EQUAL))
 		{
 			switch (instr->iGetOperator())
 			{
-				case TOKEN_AND :
-				{
-					wayUpAND(instr, queryFact);
-					break;
-				}
-				case TOKEN_OR :
-				{
-					wayUpOR(instr, queryFact);
-					break;
-				}
-				case TOKEN_XOR :
-				{
-					wayUpXOR(instr, queryFact);
-					break;
-				}
 				case TOKEN_IMPLY :
 				{
 					wayUpIMPLY(instr);
@@ -106,6 +91,68 @@ void ExpertSystem::backWardChaining(Fact * queryFact)
 				}
 			}
 		}
+		if ((instr->iGetWay() == WAY_DOWN || instr->iGetWay() == WAY_EQUAL) && queryFact == instr->getNext())
+        {
+            switch (instr->iGetOperator())
+            {
+                case TOKEN_AND :
+                {
+                    wayDownAND(instr);
+                    break;
+                }
+                case TOKEN_OR :
+                {
+                    wayDownOR(instr);
+                    break;
+                }
+                case TOKEN_XOR :
+                {
+                    wayDownXOR(instr);
+                    break;
+                }
+                case TOKEN_IMPLY :
+                {
+                    wayDownIMPLY(instr);
+                    break;
+                }
+                case TOKEN_EQUAL :
+                {
+                    wayDownEQUAL(instr);
+                    break;
+                }
+            }
+        }
+        else if ((instr->iGetWay() == WAY_UP || instr->iGetWay() == WAY_EQUAL) && queryFact != instr->getNext())
+        {
+            switch (instr->iGetOperator())
+            {
+                case TOKEN_AND :
+                {
+                    wayUpAND(instr, queryFact);
+                    break;
+                }
+                case TOKEN_OR :
+                {
+                    wayUpOR(instr, queryFact);
+                    break;
+                }
+                case TOKEN_XOR :
+                {
+                    wayUpXOR(instr, queryFact);
+                    break;
+                }
+                case TOKEN_IMPLY :
+                {
+                    wayUpIMPLY(instr);
+                    break;
+                }
+                case TOKEN_EQUAL :
+                {
+                    wayDownEQUAL(instr);
+                    break;
+                }
+            }
+        }
 	}
 }
 
@@ -234,12 +281,91 @@ void ExpertSystem::PrintVerboseUp(std::string instr, std::string fact1, std::str
 			<< " so \033[32m" << (bNeg1 ? "!" : "") << szName1 << "\033[m is \033[31m" << szValueOne << "\033[m" << std::endl;
 }
 
+void ExpertSystem::PrintImply(std::string fact1, std::string next, bool bNeg1, bool bNegNext, int iStateOne, int iStateNext)
+{
+	std::string szValueNext;
+	std::string szValueOne;
+	std::string szName1;
+	std::string szName3;
+
+	if (iStateNext == STATE_TRUE)
+		szValueNext = "True";
+	else if (iStateNext == STATE_FALSE)
+		szValueNext = "False";
+	else
+		szValueNext = "Unknown";
+
+	if (iStateOne == STATE_TRUE)
+		szValueOne = "True";
+	else if (iStateOne == STATE_FALSE)
+		szValueOne = "False";
+	else
+		szValueOne = "Unknown";
+
+	if (!fact1.compare(""))
+		szName1 = "Token Mixed";
+	else
+		szName1 = fact1;
+
+	if (!next.compare(""))
+		szName3 = "Token Mixed";
+	else
+		szName3 = next;
+
+	if (iStateOne == STATE_TRUE)
+	{
+		std::cout << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " IMPLY that " << (bNegNext ? "!" : "") << szName3 << " is " << szValueNext << std::endl;
+	}
+	else if (iStateNext == STATE_FALSE)
+	{
+		std::cout << (bNegNext ? "!" : "") << szName3 <<  " is " << szValueNext << " IMPLY that " << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " (contrapositive) " << std::endl;
+	}
+	else
+	{
+		std::cout << "False on unknown fact doesn't IMPLY anything : " << (bNeg1 ? "!" : "") << szName1 << " IMPLY " << (bNegNext ? "!" : "") << szName3 << " with " << szValueOne << " and " << szValueNext << std::endl;
+	}
+}
+
+void ExpertSystem::PrintEQUAL(std::string fact1, std::string next, bool bNeg1, bool bNegNext, int iStateOne, int iStateNext)
+{
+	std::string szValueNext;
+	std::string szValueOne;
+	std::string szName1;
+	std::string szName3;
+
+	if (iStateNext == STATE_TRUE)
+		szValueNext = "True";
+	else if (iStateNext == STATE_FALSE)
+		szValueNext = "False";
+	else
+		szValueNext = "Unknown";
+
+	if (iStateOne == STATE_TRUE)
+		szValueOne = "True";
+	else if (iStateOne == STATE_FALSE)
+		szValueOne = "False";
+	else
+		szValueOne = "Unknown";
+
+	if (!fact1.compare(""))
+		szName1 = "Token Mixed";
+	else
+		szName1 = fact1;
+
+	if (!next.compare(""))
+		szName3 = "Token Mixed";
+	else
+		szName3 = next;
+
+	std::cout << (bNeg1 ? "!" : "") << szName1 << " is " << szValueOne << " EQUIVALENT that " << (bNegNext ? "!" : "") << szName3 << " is " << szValueNext << std::endl;
+}
+
 void ExpertSystem::wayDownAND(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * sndFact = instr->getSecLink();
-	backWardChaining(fstFact);
-	backWardChaining(sndFact);
+	backWardChaining(fstFact, instr);
+	backWardChaining(sndFact, instr);
 
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueSecond = getStateValue(sndFact->iGetState(), instr->bGetNegTwo());
@@ -282,8 +408,8 @@ void ExpertSystem::wayDownOR(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * sndFact = instr->getSecLink();
-	backWardChaining(fstFact);
-	backWardChaining(sndFact);
+	backWardChaining(fstFact, instr);
+	backWardChaining(sndFact, instr);
 
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueSecond = getStateValue(sndFact->iGetState(), instr->bGetNegTwo());
@@ -316,7 +442,6 @@ void ExpertSystem::wayDownOR(Instr * instr)
 	else
 	{
 		instr->getNext()->SetState(STATE_UNKNOWN);
-
 		if (bVerbose)
 		{
 			PrintVerbose("OR", fstFact->szGetName(), sndFact->szGetName(), instr->getNext()->szGetName(),
@@ -329,8 +454,8 @@ void ExpertSystem::wayDownXOR(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * sndFact = instr->getSecLink();
-	backWardChaining(fstFact);
-	backWardChaining(sndFact);
+	backWardChaining(fstFact, instr);
+	backWardChaining(sndFact, instr);
 
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueSecond = getStateValue(sndFact->iGetState(), instr->bGetNegTwo());
@@ -375,7 +500,7 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * nextFact = instr->getNext();
-	backWardChaining(fstFact);
+	backWardChaining(fstFact, instr);
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 
@@ -385,7 +510,7 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 		{
 			if (nextFact->bGetIsSet() && valueFirst != valueNext)
 			{
-				std::cerr <<  "Incoherence in the rules N1" << std::endl;
+				std::cerr <<  "Incoherence in the rules : WRONG IMPLY" << std::endl;
 				exit(0);
 			}
 			SetState(STATE_TRUE, instr->bGetNegNext(), nextFact);
@@ -398,7 +523,7 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 	{
 		if (fstFact->bGetIsSet() && valueFirst != valueNext)
 		{
-			std::cerr <<  "Incoherence in the rules N2" << std::endl;
+			std::cerr <<  "Incoherence in the rules : WRONG IMPLY (contrapositive)" << std::endl;
 			exit(0);
 		}
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
@@ -416,19 +541,22 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 	{
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
 	}
+	if (bVerbose)
+		PrintImply(fstFact->szGetName(), nextFact->szGetName(), instr->bGetNegOne(), instr->bGetNegNext(), getStateValue(fstFact->iGetState(),  instr->bGetNegOne()), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }
 
 void ExpertSystem::wayDownEQUAL(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * nextFact = instr->getNext();
-	backWardChaining(fstFact);
+	backWardChaining(fstFact, instr);
+	backWardChaining(nextFact, instr);
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 	
 	if (fstFact->bGetIsSet() && nextFact->bGetIsSet() && valueFirst != valueNext)
 	{
-		std::cerr <<  "Incoherence in the rules N3" << std::endl;
+		std::cerr <<  "Incoherence in the rules : WRONG EQUIVALANCE " << std::endl;
 		exit(0);
 	}
 	else if (fstFact->bGetIsSet() && !nextFact->bGetIsSet())
@@ -458,10 +586,8 @@ void ExpertSystem::wayDownEQUAL(Instr * instr)
 		else
 			nextFact->SetState(valueFirst);
 	}
-	else
-	{
-		// YOU ARE USLESS BRO
-	}
+	if (bVerbose)
+		PrintEQUAL(fstFact->szGetName(), nextFact->szGetName(), instr->bGetNegOne(), instr->bGetNegNext(), getStateValue(fstFact->iGetState(),  instr->bGetNegOne()), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }
 
 void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
@@ -488,8 +614,8 @@ void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
 		bNegSnd = instr->bGetNegOne();
 	}
 
-	backWardChaining(sndFact);
-	backWardChaining(nextFact);
+	backWardChaining(sndFact, instr);
+	backWardChaining(nextFact, instr);
 
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 	int valueSecond = getStateValue(sndFact->iGetState(), bNegSnd);
@@ -500,7 +626,7 @@ void ExpertSystem::wayUpAND(Instr * instr, Fact * queryFact)
 		{
 			if (sndFact->bGetIsSet() && valueSecond == STATE_FALSE)
 			{
-				std::cerr <<  "Incoherence in the rules N4" << std::endl;
+				std::cerr <<  "Incoherence in the rules : WRONG AND" << std::endl;
 				exit(0);
 			}
 			else if (!sndFact->bGetIsSet())
@@ -577,8 +703,8 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 		bNegSnd = instr->bGetNegOne();
 	}
 
-	backWardChaining(sndFact);
-	backWardChaining(nextFact);
+	backWardChaining(sndFact, instr);
+	backWardChaining(nextFact, instr);
 
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 	int valueSecond = getStateValue(sndFact->iGetState(), bNegSnd);
@@ -589,7 +715,7 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 		{
 			if (sndFact->bGetIsSet() && valueSecond == STATE_TRUE)
 			{
-				std::cerr <<  "Incoherence in the rules N5" << std::endl;
+				std::cerr <<  "Incoherence in the rules : WRONG OR" << std::endl;
 				exit(0);
 			}
 			else if (sndFact->bGetIsSet() && valueSecond == STATE_FALSE)
@@ -616,6 +742,7 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 	}
@@ -640,13 +767,14 @@ void ExpertSystem::wayUpOR(Instr * instr, Fact * queryFact)
 		}
 		else if (valueNext == STATE_TRUE)
 		{
-			if (valueSecond == STATE_FALSE)
+			if (valueSecond == STATE_FALSE && sndFact->bGetIsSet() )
 			{
 				SetState(STATE_TRUE, bNegFst, fstFact);
 			}
 			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 	}
@@ -678,8 +806,8 @@ void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)
 		bNegSnd = instr->bGetNegOne();
 	}
 
-	backWardChaining(sndFact);
-	backWardChaining(nextFact);
+	backWardChaining(sndFact, instr);
+	backWardChaining(nextFact, instr);
 
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 	int valueSecond = getStateValue(sndFact->iGetState(), bNegSnd);
@@ -688,40 +816,40 @@ void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)
 	{
 		if (valueNext == STATE_TRUE)
 		{
-			if (valueSecond == STATE_TRUE)
+			if (valueSecond == STATE_TRUE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_FALSE, bNegFst, fstFact);
-				if (sndFact->bGetIsSet())
-					fstFact->SetIsSet(true);	
+				fstFact->SetIsSet(true);	
 			}
-			else if (valueSecond == STATE_FALSE)
+			else if (valueSecond == STATE_FALSE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_TRUE, bNegFst, fstFact);
-				if (sndFact->bGetIsSet())
-					fstFact->SetIsSet(true);
+				fstFact->SetIsSet(true);
 			}
-			else if (valueSecond == STATE_UNKNOWN)
+			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 		else if (valueNext == STATE_FALSE)
 		{
-			if (valueSecond == STATE_TRUE)
+			if (valueSecond == STATE_TRUE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_TRUE, bNegFst, fstFact);
 				if (sndFact->bGetIsSet())
 					fstFact->SetIsSet(true);	
 			}
-			else if (valueSecond == STATE_FALSE)
+			else if (valueSecond == STATE_FALSE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_FALSE, bNegFst, fstFact);
 				if (sndFact->bGetIsSet())
 					fstFact->SetIsSet(true);
 			}
-			else if (valueSecond == STATE_UNKNOWN)
+			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 	}
@@ -729,36 +857,40 @@ void ExpertSystem::wayUpXOR(Instr * instr, Fact * queryFact)
 	{
 		if (valueNext == STATE_TRUE)
 		{
-			if (valueSecond == STATE_TRUE)
+			if (valueSecond == STATE_TRUE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_FALSE, bNegFst, fstFact);
 			}
-			else if (valueSecond == STATE_FALSE)
+			else if (valueSecond == STATE_FALSE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_TRUE, bNegFst, fstFact);
 			}
-			else if (valueSecond == STATE_UNKNOWN)
+			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 		else if (valueNext == STATE_FALSE)
 		{
-			if (valueSecond == STATE_TRUE)
+			if (valueSecond == STATE_TRUE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_TRUE, bNegFst, fstFact);
 			}
-			else if (valueSecond == STATE_FALSE)
+			else if (valueSecond == STATE_FALSE && sndFact->bGetIsSet())
 			{
 				SetState(STATE_FALSE, bNegFst, fstFact);
 			}
-			else if (valueSecond == STATE_UNKNOWN)
+			else
 			{
 				fstFact->SetState(STATE_UNKNOWN);
+				sndFact->SetState(STATE_UNKNOWN);
 			}
 		}
 		else if (valueNext == STATE_UNKNOWN)
 		{
+			if (!sndFact->bGetIsSet())
+				sndFact->SetState(STATE_UNKNOWN);
 			fstFact->SetState(STATE_UNKNOWN);
 		}
 	}
@@ -770,7 +902,7 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 {
 	Fact * fstFact = instr->getFirstLink();
 	Fact * nextFact = instr->getNext();
-	backWardChaining(nextFact);
+	backWardChaining(nextFact, instr);
 	int valueFirst = getStateValue(fstFact->iGetState(), instr->bGetNegOne());
 	int valueNext = getStateValue(nextFact->iGetState(), instr->bGetNegNext());
 	if (valueFirst == STATE_TRUE)
@@ -779,7 +911,7 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 		{
 			if (nextFact->bGetIsSet() && valueFirst != valueNext)
 			{
-				std::cerr <<  "Incoherence in the rules N1" << std::endl;
+				std::cerr <<  "Incoherence in the rules : WRONG IMPLY" << std::endl;
 				exit(0);
 			}
 			SetState(STATE_TRUE, instr->bGetNegNext(), nextFact);
@@ -792,7 +924,7 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 	{
 		if (fstFact->bGetIsSet() && valueFirst != valueNext)
 		{
-			std::cerr <<  "Incoherence in the rules N2" << std::endl;
+			std::cerr <<  "Incoherence in the rules : WRONG IMPLY (contrapositive)" << std::endl;
 			exit(0);
 		}
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
@@ -810,4 +942,6 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 	{
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
 	}
+	if (bVerbose)
+		PrintImply(fstFact->szGetName(), nextFact->szGetName(),  instr->bGetNegOne(), instr->bGetNegNext(), getStateValue(fstFact->iGetState(),  instr->bGetNegOne()), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }

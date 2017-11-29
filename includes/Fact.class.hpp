@@ -35,10 +35,13 @@ public:
 
 	std::vector<Instr *> tabLink;
 
-	std::string szGetName() { return szName; };
+	std::string szGetName() { return (szName == "") ? "TokenMixed" : szName; };
 	int iGetState() { return iState; };
 	bool bGetIsSet() { return bIsSet; };
 
 	void SetState(int state);
 	void SetIsSet(bool set) { bIsSet = set; };
+
+	static bool bUnknown;
+	static void setUnknown(bool unknown) { Fact::bUnknown = unknown; };
 };

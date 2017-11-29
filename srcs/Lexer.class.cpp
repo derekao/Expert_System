@@ -77,25 +77,30 @@ void Lexer::deleteVector(std::vector<Token *> *vector)
 {
 	for (size_t i = 0; i < vector->size(); i++)
 	{
-		if (vector->at(i)->bGetIsMixed())
-		{
-			delete dynamic_cast<TokenMixed *>(vector->at(i));
-		}
-		else if (vector->at(i)->bGetIsOperator())
-		{
-			delete dynamic_cast<Operator *>(vector->at(i));
-		}
-		else if (!vector->at(i)->bGetIsOperator())
-		{
-			delete dynamic_cast<TokenFact *>(vector->at(i));
-		}
-		else
-		{
-			std::cerr << "ERROR : UNSET TOKEN" << std::endl;
-			exit (0);
-		}
+		Lexer::deleteToken(vector->at(i));
 	}
 	delete vector;
+}
+
+void Lexer::deleteToken(Token * token)
+{
+	if (token->bGetIsMixed())
+	{
+		delete dynamic_cast<TokenMixed *>(token);
+	}
+	else if (token->bGetIsOperator())
+	{
+		delete dynamic_cast<Operator *>(token);
+	}
+	else if (!token->bGetIsOperator())
+	{
+		delete dynamic_cast<TokenFact *>(token);
+	}
+	else
+	{
+		std::cerr << "ERROR : UNSET TOKEN" << std::endl;
+		exit (0);
+	}
 }
 
 void Lexer::LexLine(std::string szLine, int iLine)

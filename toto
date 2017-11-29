@@ -1,4 +1,4 @@
-R => D | B
-A + B + C + D + E + Z | Y => W
-?WA
-=ABR
+A => B | C
+B => D
+?D
+=A

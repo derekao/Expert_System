@@ -6,6 +6,7 @@
 # include "Operator.class.hpp"
 # include "Fact.class.hpp"
 # include "TokenMixed.class.hpp"
+# include "Lexer.class.hpp"
 
 class Parser
 {
@@ -13,6 +14,8 @@ private:
 	std::vector< std::vector<Token *> *> *CVectorToken;
 	std::vector<Fact *> *FactTab;
 	std::vector<std::string> nodeValueTab;
+
+	bool bDebug;
 
 	Parser(void);
 	void	splitLineToken(std::vector<Token *> *tokenLine);
@@ -30,6 +33,6 @@ private:
 
 public:
 	void PrintGraph();
-	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *> *, std::vector<std::string> *);
+	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *> *, std::vector<std::string> *, bool);
 	~Parser(void) {};
 };

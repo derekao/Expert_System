@@ -14,7 +14,10 @@ private:
 
 	std::vector<Fact *> * tabFact;
 	std::vector<std::string> * tabQuery;
+
 	bool bVerbose;
+	bool bUnknown;
+	bool bDebug;
 
 	ExpertSystem();
 
@@ -22,6 +25,8 @@ private:
 	void SetState(int iState, bool bNeg, Fact * fact);
 	void PrintVerbose(std::string instr, std::string fact1, std::string fact2, std::string next, bool bNeg1, bool bNeg2, bool bNegNext, std::string str, int iState);
 	void PrintVerboseUp(std::string instr, std::string fact1, std::string fact2, std::string next, bool bNeg1, bool bNeg2, bool bNegNext, int iStateNext, int iStateTwo, int iStateOne);
+	void PrintImply(std::string fact1, std::string next, bool bNeg1, bool bNegNext, int iStateOne, int iStateNext);
+	void PrintEQUAL(std::string fact1, std::string next, bool bNeg1, bool bNegNext, int iStateOne, int iStateNext);
 	
 
 	void wayDownAND(Instr * instr);
@@ -34,10 +39,10 @@ private:
 	void wayUpOR(Instr * instr, Fact * queryFact);
 	void wayUpXOR(Instr * instr, Fact * queryFact);
 	void wayUpIMPLY(Instr * instr);
-	void backWardChaining(Fact *);
+	void backWardChaining(Fact *, Instr *);
 
 public:
-	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, bool);
+	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, bool, bool, bool);
 	~ExpertSystem() {} ;
 
 };
