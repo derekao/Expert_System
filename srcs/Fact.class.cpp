@@ -27,7 +27,6 @@ Fact::Fact() : szName(""), iState(STATE_FALSE), bIsSet(false)
 void Fact::SetState(int state) 
 {
 	int tmp;
-	ExpertSystem::bRestart = true;
 	if (!bIsSet || iState == state)
 	{
 		if (Fact::bUnknown && state == STATE_UNKNOWN)

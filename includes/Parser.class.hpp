@@ -14,6 +14,7 @@ private:
 	std::vector< std::vector<Token *> *> *CVectorToken;
 	std::vector<Fact *> *FactTab;
 	std::vector<std::string> nodeValueTab;
+	std::vector<Instr *> *tabInstr;
 
 	bool bDebug;
 
@@ -33,6 +34,6 @@ private:
 
 public:
 	void PrintGraph();
-	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *> *, std::vector<std::string> *, bool);
+	Parser(std::vector< std::vector<Token *> *> *, std::vector<Fact *> *, std::vector<std::string> *, std::vector<Instr *> *,bool);
 	~Parser(void) {};
 };

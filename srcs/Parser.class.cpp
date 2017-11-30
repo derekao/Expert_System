@@ -1,7 +1,7 @@
 #include "Parser.class.hpp"
 
-Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> * link, std::vector<std::string> * tabQuery, bool debug) 
-			: CVectorToken(CVector), FactTab(link), bDebug(debug)
+Parser::Parser(std::vector< std::vector<Token *> *> *CVector, std::vector<Fact *> * link, std::vector<std::string> * tabQuery, std::vector<Instr *> * TabInstr,bool debug) 
+			: CVectorToken(CVector), FactTab(link), tabInstr(TabInstr), bDebug(debug)
 {
 	for (size_t i = 0; i < CVectorToken->size(); i++)
 	{
@@ -233,6 +233,7 @@ void Parser::buildGraph(std::vector<Token *> *input1, std::vector<Token *> *inpu
 		instr = new Instr(wayIn, NULL, wayOut, TOKEN_IMPLY, WAY_DOWN);
 		instr->SetNeg(bFirstFact, 0, bNextFact);
 	}
+	tabInstr->push_back(instr);
 	wayIn->tabLink.push_back(instr);
 	wayOut->tabLink.push_back(instr);
 }
@@ -285,6 +286,7 @@ Fact * Parser::buildNode(std::vector<Token *> *input, int iWay)
 	fact1->tabLink.push_back(instr);
 	fact2->tabLink.push_back(instr);
 	next->tabLink.push_back(instr);
+	tabInstr->push_back(instr);
 	return buildNode(input, iWay);
 }
 

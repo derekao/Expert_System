@@ -14,6 +14,7 @@ private:
 
 	std::vector<Fact *> * tabFact;
 	std::vector<std::string> * tabQuery;
+	std::vector<Instr *> * tabInstr;
 
 	bool bVerbose;
 	bool bUnknown;
@@ -42,9 +43,10 @@ private:
 	void backWardChaining(Fact *, Instr *);
 
 	void displayResult();
+	void resetInstr();
 
 public:
-	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, bool, bool, bool);
+	ExpertSystem(std::vector<Fact *> *, std::vector<std::string> *, std::vector<Instr *> *,bool, bool, bool);
 	~ExpertSystem() {} ;
 
 	static bool bRestart;

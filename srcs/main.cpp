@@ -57,11 +57,12 @@ int main(int ac, char **av)
 			std::vector< std::vector<Token *> *> CVectorToken;
 			std::vector<Fact *> TabFact;
 			std::vector<std::string> TabQuery;
+			std::vector<Instr *> TabInstr;
 
 			Fact::setUnknown(bUnknown);
 			Lexer(vecArgv[i], &CVectorToken);
-			Parser(&CVectorToken, &TabFact, &TabQuery, bDebug);
-			ExpertSystem(&TabFact, &TabQuery, bVerbose, bUnknown, bDebug);
+			Parser(&CVectorToken, &TabFact, &TabQuery, &TabInstr ,bDebug);
+			ExpertSystem(&TabFact, &TabQuery, &TabInstr,bVerbose, bUnknown, bDebug);
 			return 0;
 		}
 		helper();

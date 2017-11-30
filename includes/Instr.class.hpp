@@ -43,6 +43,7 @@ public:
 	int iGetNbIteration() { return iIteration; };
 
 	void IncreaseInteration() { iIteration++; };
+	void ResetIteration() { iIteration = 0; };
 
 	bool bGetNegOne() { return bNegOne; } ;
 	bool bGetNegTwo() { return bNegTwo; } ;

@@ -112,6 +112,8 @@ void Lexer::LexLine(std::string szLine, int iLine)
 	{
 		while (isspace(szLine[i]))
 			i++;
+		if (!szLine[i])
+			break;
 		if (szLine[i] == '#')
 			break ;
 		else if (szLine[i] == '+')

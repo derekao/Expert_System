@@ -2,12 +2,12 @@
 
 bool ExpertSystem::bRestart = false;
 
-ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, bool verbose, bool unknown, bool debug) :
-			tabFact(vtabFact), tabQuery(vtabQuery), bVerbose(verbose), bUnknown(unknown), bDebug(debug)
+ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::string> * vtabQuery, std::vector<Instr *> *TabInstr,bool verbose, bool unknown, bool debug) :
+			tabFact(vtabFact), tabQuery(vtabQuery), tabInstr(TabInstr), bVerbose(verbose), bUnknown(unknown), bDebug(debug)
 {
     for (size_t i = 0; i < tabQuery->size(); i++)
     {
-        for (size_t j = 0; j < tabFact->size(); j++)
+      	for (size_t j = 0; j < tabFact->size(); j++)
         {
             if (tabFact->at(j)->szGetName() == tabQuery->at(i))
             {
@@ -20,8 +20,17 @@ ExpertSystem::ExpertSystem(std::vector<Fact *> * vtabFact, std::vector<std::stri
            		break ;
             }
         }
+		resetInstr();
     }
     displayResult();
+}
+
+void ExpertSystem::resetInstr()
+{
+	for (size_t i = 0; i < tabInstr->size(); i++)
+	{
+		tabInstr->at(i)->ResetIteration();
+	}
 }
 
 void ExpertSystem::displayResult()
@@ -46,7 +55,7 @@ void ExpertSystem::displayResult()
 			}
         }
 		if (!bInTabFact)
-			std::cout << tabQuery->at(i) << " = False Unset" << std::endl;
+			std::cout << "\033[32m" << tabQuery->at(i) << "\033[m = \033[31mFalse\033[m \033[36mUnset\033[m" << std::endl;
 	}
 }
 
@@ -540,10 +549,12 @@ void ExpertSystem::wayDownIMPLY(Instr * instr)
 	{
 		fstFact->SetState(STATE_UNKNOWN);
 	}
-	else if (valueNext == STATE_FALSE) // Contrapose
+	else if (valueNext == STATE_FALSE && !fstFact->bGetIsSet()) // Contrapose
 	{
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
 	}
+	else
+		return;
 	if (bVerbose)
 		PrintImply(fstFact->szGetName(), nextFact->szGetName(), instr->bGetNegOne(), instr->bGetNegNext(), getStateValue(fstFact->iGetState(),  instr->bGetNegOne()), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }
@@ -941,10 +952,12 @@ void ExpertSystem::wayUpIMPLY(Instr * instr)
 	{
 		fstFact->SetState(STATE_UNKNOWN);
 	}
-	else if (valueNext == STATE_FALSE) // Contrapose
+	else if (valueNext == STATE_FALSE && !fstFact->bGetIsSet()) // Contrapose
 	{
 		SetState(STATE_FALSE, instr->bGetNegOne(), fstFact);
 	}
+	else
+		return ;
 	if (bVerbose)
 		PrintImply(fstFact->szGetName(), nextFact->szGetName(),  instr->bGetNegOne(), instr->bGetNegNext(), getStateValue(fstFact->iGetState(),  instr->bGetNegOne()), getStateValue(nextFact->iGetState(), instr->bGetNegNext()));
 }
