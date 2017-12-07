@@ -27,11 +27,17 @@
 # define TOKEN_FACT		9 // =
 # define TOTAL_TOKEN	10
 
+# define NO_PRECEDENCE 0
+# define OR_PRECEDENCE 1
+# define XOR_PRECEDENCE 2
+# define AND_PRECEDENCE 3
+
 class Operator : public Token
 {
 	
 private:
 	int _iID;
+	int _iPrecedence;
 
 	Operator(void);
 
@@ -45,5 +51,5 @@ public:
 
 	void SetNeg(bool bNeg) { _bNeg = bNeg; } ;
 
-	int iGetPrecedence(void); //TODO
+	int iGetPrecedence(void) { return _iPrecedence; };
 };

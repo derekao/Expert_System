@@ -107,6 +107,7 @@ void Lexer::LexLine(std::string szLine, int iLine)
 {
 	std::vector<Token *> *tmpVector = new std::vector<Token *>;
 	bool bNeg = false;
+	bool bIsFact = false;
 
 	for (size_t i = 0; i < szLine.length(); i++)
 	{
@@ -116,59 +117,76 @@ void Lexer::LexLine(std::string szLine, int iLine)
 			break;
 		if (szLine[i] == '#')
 			break ;
-		else if (szLine[i] == '+')
-			tmpVector->push_back(new Operator(TOKEN_AND));
-		else if (szLine[i] == '|')
-			tmpVector->push_back(new Operator(TOKEN_OR));
-		else if (szLine[i] == '^')
-			tmpVector->push_back(new Operator(TOKEN_XOR));
-		else if (szLine[i] == '!' && (isupper(szLine[i + 1]) || szLine[i]))
-			bNeg = true;
-		else if (szLine[i] == '!')
+		if (isupper(szLine[i]))
 		{
-			bError = true;
-			VectorError.push_back("Negation error : " + szLine.substr(i, 1)
-					+ " at line : " + std::to_string(iLine));
-			Lexer::deleteVector(tmpVector);
-			return ;
-		}
-		else if (szLine[i] == '(')
-		{
-			tmpVector->push_back(new Operator(TOKEN_OPEN, true));
-			bNeg = false;
-		}
-		else if (szLine[i] == ')')
-			tmpVector->push_back(new Operator(TOKEN_CLOSE));
-		else if (szLine[i] == '=' && szLine[i + 1] == '>')
-		{
-			tmpVector->push_back(new Operator(TOKEN_IMPLY));
-			i++;
-		}
-		else if (szLine[i] == '<' && szLine[i + 1] == '=' && szLine[i + 2] == '>')
-		{
-			tmpVector->push_back(new Operator(TOKEN_EQUAL));
-			i += 2;
-		}
-		else if (szLine[i] == '?')
-			tmpVector->push_back(new Operator(TOKEN_QUERY));
-		else if (szLine[i] == '=')
-			tmpVector->push_back(new Operator(TOKEN_FACT));
-		else if (isupper(szLine[i]))
-		{
+			if (bIsFact)
+			{
+				if (!(tmpVector->at(0)->bGetIsOperator() && ((dynamic_cast<Operator *>(tmpVector->at(0)))->iGetID() == TOKEN_QUERY 
+					|| (dynamic_cast<Operator *>(tmpVector->at(0))->iGetID() == TOKEN_FACT))))
+				{
+					bError = true;
+					VectorError.push_back("No operation error : " + szLine.substr(i, 1)
+							+ " at line : " + std::to_string(iLine));
+					Lexer::deleteVector(tmpVector);
+					return ;
+				}
+			}
 			int j = i + 1;
 			while (islower(szLine[j]))
 				j++;
 			tmpVector->push_back(new TokenFact(szLine.substr(i, j - i), bNeg));
 			bNeg = false;
 			i += j - i - 1;
+			bIsFact = true;
 		}
 		else
 		{
-			bError = true;
-			VectorError.push_back("Unknown char : " + szLine.substr(i, 1)
-					+ " at line : " + std::to_string(iLine));
-			Lexer::deleteVector(tmpVector);
-			return ;
+			bIsFact = false;
+			if (szLine[i] == '+')
+				tmpVector->push_back(new Operator(TOKEN_AND));
+			else if (szLine[i] == '|')
+				tmpVector->push_back(new Operator(TOKEN_OR));
+			else if (szLine[i] == '^')
+				tmpVector->push_back(new Operator(TOKEN_XOR));
+			else if (szLine[i] == '!' && (isupper(szLine[i + 1]) || szLine[i]))
+				bNeg = true;
+			else if (szLine[i] == '!')
+			{
+				bError = true;
+				VectorError.push_back("Negation error : " + szLine.substr(i, 1)
+						+ " at line : " + std::to_string(iLine));
+				Lexer::deleteVector(tmpVector);
+				return ;
+			}
+			else if (szLine[i] == '(')
+			{
+				tmpVector->push_back(new Operator(TOKEN_OPEN, true));
+				bNeg = false;
+			}
+			else if (szLine[i] == ')')
+				tmpVector->push_back(new Operator(TOKEN_CLOSE));
+			else if (szLine[i] == '=' && szLine[i + 1] == '>')
+			{
+				tmpVector->push_back(new Operator(TOKEN_IMPLY));
+				i++;
+			}
+			else if (szLine[i] == '<' && szLine[i + 1] == '=' && szLine[i + 2] == '>')
+			{
+				tmpVector->push_back(new Operator(TOKEN_EQUAL));
+				i += 2;
+			}
+			else if (szLine[i] == '?')
+				tmpVector->push_back(new Operator(TOKEN_QUERY));
+			else if (szLine[i] == '=')
+				tmpVector->push_back(new Operator(TOKEN_FACT));
+			else
+			{
+				bError = true;
+				VectorError.push_back("Unknown char : " + szLine.substr(i, 1)
+						+ " at line : " + std::to_string(iLine));
+				Lexer::deleteVector(tmpVector);
+				return ;
+			}
 		}
 	}
 	if (tmpVector->size() == 0)

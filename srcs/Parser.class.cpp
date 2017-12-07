@@ -155,7 +155,8 @@ std::vector<Token *>	*Parser::ShuntingYardAlgo(std::vector<Token *> *Input)
 			while (Stack.size()
 				&& Stack.back()->bGetIsOperator() 
 				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() >= TOKEN_AND
-				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() <= TOKEN_XOR)
+				&& (dynamic_cast<Operator *>(Stack.back()))->iGetID() <= TOKEN_XOR
+				&& (dynamic_cast<Operator *>(Input->at(i)))->iGetPrecedence() <= (dynamic_cast<Operator *>(Stack.back()))->iGetPrecedence())
 			{
 				Output->push_back(Stack.back());
 				Stack.pop_back();

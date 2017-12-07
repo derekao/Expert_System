@@ -17,12 +17,24 @@
 Operator::Operator(int iID) : Token(true), _iID(iID)
 {
 	_bNeg = false;
+	if (iID == TOKEN_AND)
+		_iPrecedence = AND_PRECEDENCE;
+	else if (iID == TOKEN_OR)
+		_iPrecedence = OR_PRECEDENCE;
+	else 
+		_iPrecedence = NO_PRECEDENCE;
 	return ;
 }
 
 Operator::Operator(int iID, bool bNeg) : Token(true), _iID(iID)
 {
 	_bNeg = bNeg;
+	if (iID == TOKEN_AND)
+		_iPrecedence = AND_PRECEDENCE;
+	else if (iID == TOKEN_OR)
+		_iPrecedence = OR_PRECEDENCE;
+	else 
+		_iPrecedence = NO_PRECEDENCE;
 	return ;
 }
 
@@ -32,9 +44,6 @@ int Operator::iGetID(void) const
 	return (_iID);
 }
 
-// bool Operator::bGetNeg(void) const
-// {
-// 	return (_bNeg);
-// }
+
 
 
